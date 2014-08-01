@@ -85,9 +85,12 @@ public class ConfigCenter {
     public DatabaseAccess getDatabase() {
         return new DatabaseAccess(getManager());
     }
-
+    private ISqlout sqloutInstance;
     public ISqlout getSqlout() {
-        return (ISqlout) Reflections.instance(sqlout);
+        if(sqloutInstance==null){
+            sqloutInstance=(ISqlout) Reflections.instance(sqlout);
+        }
+        return sqloutInstance;
     }
 
     public void setAdapter(Class<? extends IAdapter> adapter) {

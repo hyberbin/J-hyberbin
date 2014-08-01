@@ -1,6 +1,7 @@
 package org.jplus.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
@@ -15,6 +16,7 @@ import org.jplus.hyb.log.LoggerManager;
  */
 public class FieldUtil {
     private static final Logger log = LoggerManager.getLogger(FieldUtil.class);
+    private final static Class[] EMPTY_ARG=new Class[]{};
     /**
      * 取得一个成员变量的值
      * @param tablebean tablebean
@@ -117,6 +119,9 @@ public class FieldUtil {
         if (ObjectHelper.isNullOrEmptyString(fieldColumn.getColumn())) {
             fieldColumn.setColumn(field.getName());
         }
+        Method getter = Reflections.getAccessibleMethod(field.getDeclaringClass(), Reflections.get(field.getName()), EMPTY_ARG);
+        Method setter = Reflections.getAccessibleMethod(field.getDeclaringClass(), Reflections.set(field.getName()), new Class[]{field.getType()});
+        fieldColumn.setHasGetterAndSetter(getter!=null&&setter!=null);
         return fieldColumn;
     }
 
@@ -163,9 +168,9 @@ public class FieldUtil {
         } catch (IllegalAccessException ex) {
             log.error("参数不正确", ex);
         } catch (InstantiationException ex) {
-            log.error("创建字段" + fieldName + "的实例失败！", ex);
+            log.error("创建字段:{}的实例失败！", fieldName,ex);
         } catch (NoSuchFieldException ex) {
-            log.error("没有" + fieldName + "字段！", ex);
+            log.error("没有{}字段！",fieldName, ex);
         }
         return setFieldValue(newInstance, newfieldName, value);
     }

@@ -14,4 +14,8 @@ import java.util.List;
 public interface ISqlout {
 
     public void sqlout(String sql, List parmeters);
+    
+    public void setSqlout(boolean needout);
+    
+    public boolean isSqlout();
 }

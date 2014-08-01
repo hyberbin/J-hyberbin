@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -187,6 +189,7 @@ public class Hyberbin<T> extends BaseDbTool{
     private Object loadData(Object table, ResultSet rs) throws Exception {
         log.trace("in loadData");
         for (FieldColumn fieldColumn : fields) {
+            if(fieldColumn.isIgnore())continue;
             Field field = fieldColumn.getField();
             if (field.isAnnotationPresent(JoinColumn.class)) {//存在字段是外键的注解
                 log.trace("has joinColumn field:{}", field.getName());
@@ -241,7 +244,19 @@ public class Hyberbin<T> extends BaseDbTool{
             getResultSet = rs.getObject(fieldColumn.getColumn(), type);
         }
         log.trace("loaded Data object:{},field:{},column:{},value:{}", table.getClass().getSimpleName(), fieldColumn.getField().getName(), fieldColumn.getColumn(), getResultSet);
-        Reflections.invokeSetter(table, fieldColumn.getField().getName(), getResultSet, type);
+        if(fieldColumn.isHasGetterAndSetter()){
+            log.trace("Class {} has getter and setter,use local getter and setter",table.getClass());
+            Reflections.invokeSetter(table, fieldColumn.getField().getName(), getResultSet, type);
+        }else{
+            log.trace("Class {} do not has getter and setter,use local getter and setter",table.getClass());
+            try {
+                fieldColumn.getField().set(table, getResultSet);
+            } catch (IllegalArgumentException ex) {
+                Logger.getLogger(Hyberbin.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                log.error("Class {} do not have setter and getter and set value error!",table.getClass(), ex);
+            }
+        }
     }
 
     /**

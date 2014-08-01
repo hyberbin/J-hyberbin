@@ -78,7 +78,7 @@ public class Reflections {
         try {
             result = field.get(obj);
         } catch (IllegalAccessException e) {
-            log.error(Reflections.class.getName() + "[不可访问的对象]", e);
+            log.error("{}[不可访问的对象]", obj.getClass().getName(),e);
         }
         return result;
     }
@@ -97,7 +97,7 @@ public class Reflections {
         try {
             field.set(obj, value);
         } catch (IllegalAccessException ex) {
-            log.error(Reflections.class.getName() + "[不可访问的对象]", ex);
+            log.error("{}[不可访问的对象]", obj.getClass().getName(),ex);
         }
     }
 

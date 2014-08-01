@@ -24,7 +24,12 @@ public class SimpleConfigurator implements IConfigurator {
     }
 
     public SimpleConfigurator() {
-        
+    }
+
+    public SimpleConfigurator(String url, String user, String pass) {
+        this.url = url;
+        this.user = user;
+        this.pass = pass;
     }
 
     @Override

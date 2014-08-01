@@ -47,13 +47,13 @@ public class LoadProperties {
             }
             props.load(in);
         } catch (IOException ex) {
-            log.error("LoadProperties找不到数据库配置文件，请检查缺省包下面的" + filePath + "文件!", ex);
+            log.error("LoadProperties找不到数据库配置文件，请检查缺省包下面的{}文件!",filePath, ex);
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (IOException ex) {
-                    log.error("LoadProperties找不到数据库配置文件，请检查缺省包下面的" + filePath + "文件!", ex);
+                    log.error("LoadProperties找不到数据库配置文件，请检查缺省包下面的{}文件!",filePath, ex);
                 }
             }
         }
@@ -110,7 +110,7 @@ public class LoadProperties {
             fos.flush();
             fos.close();
         } catch (IOException ex) {
-            log.error("LoadProperties写入" + filePath + "文件失败\t", ex);
+            log.error("LoadProperties写入{}文件失败\t",filePath, ex);
         }
 
     }

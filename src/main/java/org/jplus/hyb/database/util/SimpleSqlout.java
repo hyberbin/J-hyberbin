@@ -5,6 +5,7 @@
  */
 package org.jplus.hyb.database.util;
 
+import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -17,10 +18,11 @@ import org.jplus.util.ObjectHelper;
  */
 public class SimpleSqlout implements ISqlout {
     private final static SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private Boolean needout;
 
     @Override
     public void sqlout(String sql, List parmeters) {
-        if (ConfigCenter.INSTANCE.getConfigurator().sqlOut()) {
+        if (isSqlout()) {
             if (ObjectHelper.isNotEmpty(parmeters)) {
                 for (Object o : parmeters) {
                     if(o!=null){
@@ -38,6 +40,16 @@ public class SimpleSqlout implements ISqlout {
             }
             System.out.println("sqlout:  "+sql);
         }
+    }
+
+    @Override
+    public void setSqlout(boolean needout) {
+        this.needout=needout;
+    }
+
+    @Override
+    public boolean isSqlout() {
+        return needout==null?needout=ConfigCenter.INSTANCE.getConfigurator().sqlOut():needout;
     }
 
 }
