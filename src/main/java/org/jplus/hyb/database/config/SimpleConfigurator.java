@@ -11,10 +11,15 @@ package org.jplus.hyb.database.config;
  */
 public class SimpleConfigurator implements IConfigurator {
 
-    private String driver = "com.mysql.jdbc.Driver";
-    private String url = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
-    private String user = "root";
-    private String pass = "root";
+    private final static String DRIVER = "com.mysql.jdbc.Driver";
+    private final static String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
+    private final static String USER = "root";
+    private final static String PASS = "root";
+
+    private String driver = DRIVER;
+    private String url = URL;
+    private String user = USER;
+    private String pass = PASS;
 
     public SimpleConfigurator(String driver, String url, String user, String pass) {
         this.driver = driver;
@@ -27,9 +32,17 @@ public class SimpleConfigurator implements IConfigurator {
     }
 
     public SimpleConfigurator(String url, String user, String pass) {
+        this.driver = DRIVER;
         this.url = url;
         this.user = user;
         this.pass = pass;
+    }
+    
+    public SimpleConfigurator(String url) {
+        this.driver = DRIVER;
+        this.url = url;
+        this.user = USER;
+        this.pass = PASS;
     }
 
     @Override

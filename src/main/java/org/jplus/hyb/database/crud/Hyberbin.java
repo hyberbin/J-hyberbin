@@ -87,8 +87,10 @@ public class Hyberbin<T> extends BaseDbTool{
      * @param tablebean 表的实体类
      */
     public Hyberbin(T tablebean) {
-        super(ConfigCenter.INSTANCE.getManager());//数据库操作对象
-        ini(tablebean);
+        super(tablebean instanceof IDbManager?(IDbManager)tablebean: ConfigCenter.INSTANCE.getManager());//数据库操作对象
+        if(!(tablebean instanceof IDbManager)){
+            ini(tablebean);
+        }
     }
 
     public Hyberbin() {

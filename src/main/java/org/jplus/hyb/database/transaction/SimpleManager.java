@@ -15,20 +15,26 @@ public class SimpleManager extends ADbManager {
 
     @Override
     public void openTransaction() throws SQLException {
-        log.debug("open Transaction,setAutoCommit true");
-        connection.setAutoCommit(true);
+        if(!connection.isClosed()){
+            log.debug("open Transaction,setAutoCommit true");
+            connection.setAutoCommit(true);
+        }
     }
 
     @Override
     public void commit() throws SQLException {
-        log.debug("commit");
-        connection.commit();
+        if(!connection.isClosed()){
+            log.debug("commit");
+            connection.commit();
+        }
     }
 
     @Override
     public void rollBack() throws SQLException {
-        log.debug("transaction rollback");
-        connection.rollback();
+        if(!connection.isClosed()){
+            log.debug("transaction rollback");
+            connection.rollback();
+        }
     }
 
     @Override

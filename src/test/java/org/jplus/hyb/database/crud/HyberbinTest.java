@@ -13,6 +13,8 @@ import java.util.logging.Logger;
 import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.config.SimpleConfigurator;
+import org.jplus.hyb.database.transaction.IDbManager;
+import org.jplus.hyb.database.transaction.OuterManager;
 import org.jplus.hyb.database.util.Pager;
 import org.jplus.hyb.log.LocalLogger;
 import org.jplus.hyb.log.LoggerManager;
@@ -154,6 +156,7 @@ public class HyberbinTest {
         assertEquals(after, adds);
         assertNotSame(after, "abcdefg");
     }
+   
 
     /**
      * Test of setField method, of class Hyberbin.
