@@ -12,9 +12,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.config.ConfigCenter;
-import org.jplus.hyb.database.config.SimpleConfigurator;
+import org.jplus.hyb.database.config.DbConfig;
+import org.jplus.hyb.database.transaction.AutoManager;
 import org.jplus.hyb.database.transaction.IDbManager;
-import org.jplus.hyb.database.transaction.OuterManager;
+import org.jplus.hyb.database.transaction.SimpleManager;
 import org.jplus.hyb.database.util.Pager;
 import org.jplus.hyb.log.LocalLogger;
 import org.jplus.hyb.log.LoggerManager;
@@ -55,9 +56,10 @@ public class HyberbinTest {
 
     @BeforeClass
     public static void setUpClass() {
-         System.out.println( System.getProperty("classpath"));
+        System.out.println(System.getProperty("classpath"));
         LocalLogger.setLevel(LocalLogger.TRACE);
         LoggerManager.setLogFactory(LoggerFactory.class);
+        ConfigCenter.INSTANCE.setManager(new AutoManager(DbConfig.DEFAULT_CONFIG_NAME));
         //ConfigCenter.INSTANCE.setConfigurator(new SimpleConfigurator("com.microsoft.sqlserver.jdbc.SQLServerDriver", "jdbc:sqlserver://localhost;DatabaseName=test;", "hyb", "hyb"));
         DatabaseAccess access = new DatabaseAccess(ConfigCenter.INSTANCE.getManager());
         try {
@@ -70,6 +72,12 @@ public class HyberbinTest {
 
     @AfterClass
     public static void tearDownClass() {
+        IDbManager manager = ConfigCenter.INSTANCE.getManager();
+        try {
+            manager.finalCloseConnection();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @Before
@@ -122,7 +130,6 @@ public class HyberbinTest {
         fail("testSetTableName faild.");
     }
 
-
     public static Servers getByID(int id) {
         Servers servers = new Servers();
         servers.setId(id);
@@ -156,7 +163,6 @@ public class HyberbinTest {
         assertEquals(after, adds);
         assertNotSame(after, "abcdefg");
     }
-   
 
     /**
      * Test of setField method, of class Hyberbin.
@@ -470,7 +476,7 @@ public class HyberbinTest {
     @Test
     public void testGetMapList_String_Pager() {
         System.out.println("getMapList");
-         Pager pager = new Pager(2);
+        Pager pager = new Pager(2);
         Hyberbin instance = new Hyberbin(new Servers());
         String sql = "select * from Servers";
         try {

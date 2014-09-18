@@ -12,10 +12,11 @@ package org.jplus.hyb.database.config;
 public class DbConfig {
 
     public static final String DEFAULT_CONFIG_NAME = "default";
+    private final static String DRIVER = "com.mysql.jdbc.Driver";
+    private final static String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
+    private final static String USER = "root";
+    private final static String PASS = "root";
 
-    public DbConfig(String configName) {
-        this.configName = configName;
-    }
 
     public DbConfig(String driver, String url, String username, String password, String configName) {
         this.driver = driver;
@@ -24,9 +25,33 @@ public class DbConfig {
         this.password = password;
         this.configName = configName;
     }
+    
+    public DbConfig(String url, String username, String password, String configName) {
+        this.driver = DRIVER;
+        this.url = url;
+        this.username = username;
+        this.password = password;
+        this.configName = configName;
+    }
+    
+    public DbConfig(String url,String configName) {
+        this.driver = DRIVER;
+        this.url = url;
+        this.username = USER;
+        this.password = PASS;
+        this.configName = configName;
+    }
+    
+    public DbConfig(String configName) {
+        this.driver = DRIVER;
+        this.url = URL;
+        this.username = USER;
+        this.password = PASS;
+        this.configName = configName;
+    }
 
     public DbConfig() {
-        this.configName = DEFAULT_CONFIG_NAME;
+        this(DEFAULT_CONFIG_NAME);
     }
 
     /** 驱动 */

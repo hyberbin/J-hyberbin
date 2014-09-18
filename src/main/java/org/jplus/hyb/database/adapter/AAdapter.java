@@ -63,7 +63,7 @@ public abstract class AAdapter implements IAdapter {
         if (ConfigCenter.INSTANCE.getConfigurator().sqlOut()) {
             ISqlout sqlout = ConfigCenter.INSTANCE.getSqlout();
             if(sqlout!=null){
-                ConfigCenter.INSTANCE.getSqlout().sqlout(sql, parmeters);
+                sqlout.sqlout(sql, parmeters);
             }else{
                 log.error("can't find sqlout adapter,you can set it by ConfigCenter.DEFAULT_INSTANCE.setSqlout(ISqlout sqlout)");
             }

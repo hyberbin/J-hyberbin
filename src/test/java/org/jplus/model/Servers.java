@@ -57,6 +57,6 @@ public class Servers {
     public void setType(Integer type) {
         this.type = type;
     }
-    
+
     
 }

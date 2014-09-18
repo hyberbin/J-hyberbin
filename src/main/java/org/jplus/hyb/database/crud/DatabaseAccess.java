@@ -12,7 +12,7 @@ import org.jplus.hyb.database.transaction.IDbManager;
 public class DatabaseAccess extends BaseDbTool{
     
     /**
-     * 自带的连接创建数据库操作对象.
+     * 自带的事务管理器创建数据库操作对象.
      * @param tx 连接.
      */
     public DatabaseAccess(IDbManager tx) {
@@ -44,7 +44,7 @@ public class DatabaseAccess extends BaseDbTool{
     /**
      * 数据库更新操作.
      * @param sql SQL语句.
-     * @return 是否成功.
+     * @return 受影响的数据条数.
      * @throws java.sql.SQLException
      */
     public int update(String sql) throws SQLException {
@@ -66,7 +66,7 @@ public class DatabaseAccess extends BaseDbTool{
     }
 
     /**
-     * 数据库查询操作.
+     * 查询唯一的一条记录.
      * @param sql SQL语句.
      * @return 查询结果.
      * @throws java.sql.SQLException
@@ -78,7 +78,7 @@ public class DatabaseAccess extends BaseDbTool{
     }
 
     /**
-     * 数据库查询操作.
+     * 查询唯一的单值对象.
      * @param sql SQL语句.
      * @return 查询结果.
      * @throws java.sql.SQLException

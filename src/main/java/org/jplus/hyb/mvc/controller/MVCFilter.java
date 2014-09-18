@@ -3,7 +3,6 @@ package org.jplus.hyb.mvc.controller;
 import org.jplus.annotation.Before;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.transaction.IDbManager;
-import org.jplus.hyb.database.transaction.IOuterManager;
 import org.jplus.hyb.log.LocalLogger;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
@@ -23,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Set;
+import org.jplus.hyb.database.config.DbConfig;
 
 /**
  * MVCFilter说明.
@@ -43,7 +43,7 @@ public class MVCFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         LocalLogger.setLevel(NumberUtils.parseInt(filterConfig.getInitParameter("level")));
         LoggerManager.setLogFactory(filterConfig.getInitParameter("loggerFactory"));
-        ConfigCenter.INSTANCE.setManager("org.jplus.hyb.database.transaction.OuterManager");
+        ConfigCenter.INSTANCE.setManager("org.jplus.hyb.database.transaction.AutoManager",DbConfig.DEFAULT_CONFIG_NAME);
     }
 
     /**
@@ -134,12 +134,10 @@ public class MVCFilter implements Filter {
                 log.error("执行Controller出错！！！！url:{},mapping:{}", url,  mvcMmethod.getMethod().getName(),ex);
             }finally {
                 IDbManager manager = ConfigCenter.INSTANCE.getManager();
-                if(manager instanceof IOuterManager){
-                    try {
-                        ((IOuterManager)manager).close();
-                    } catch (SQLException e) {
-                        log.error("close database connection error", e);
-                    }
+                try {
+                    manager.finalCloseConnection();
+                } catch (SQLException ex) {
+                    log.error("outterCloseConnection error!", ex);
                 }
             }
         }

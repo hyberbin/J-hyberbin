@@ -1,67 +1,67 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.jplus.hyb.database.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
+ * 简单的配置器.
+ * 可以添加多个配置用来在一个项目中连接多个数据库.
  * @author Hyberbin
  */
-public class SimpleConfigurator implements IConfigurator {
+public final class SimpleConfigurator implements IConfigurator {
 
-    private final static String DRIVER = "com.mysql.jdbc.Driver";
-    private final static String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
-    private final static String USER = "root";
-    private final static String PASS = "root";
+    private static final Map<String, DbConfig> DBCONFIGS = new HashMap<String, DbConfig>();
+    public static final SimpleConfigurator INSTANCE = new SimpleConfigurator();
 
-    private String driver = DRIVER;
-    private String url = URL;
-    private String user = USER;
-    private String pass = PASS;
-
-    public SimpleConfigurator(String driver, String url, String user, String pass) {
-        this.driver = driver;
-        this.url = url;
-        this.user = user;
-        this.pass = pass;
+    static {//自动添加一个默认的配置
+        addConfigurator(new DbConfig());
     }
-
-    public SimpleConfigurator() {
+    /**
+     * 添加一个数据配置.
+     * @param config 
+     */
+    public static void addConfigurator(DbConfig config) {
+        DBCONFIGS.put(config.getConfigName(), config);
     }
-
-    public SimpleConfigurator(String url, String user, String pass) {
-        this.driver = DRIVER;
-        this.url = url;
-        this.user = user;
-        this.pass = pass;
-    }
-    
-    public SimpleConfigurator(String url) {
-        this.driver = DRIVER;
-        this.url = url;
-        this.user = USER;
-        this.pass = PASS;
-    }
-
+    /**
+     * 获取默认配置
+     * @return 
+     */
     @Override
     public DbConfig getDefaultConfig() {
-        return new DbConfig(driver, url, user, pass, DbConfig.DEFAULT_CONFIG_NAME);
+        return DBCONFIGS.get(DbConfig.DEFAULT_CONFIG_NAME);
     }
-
+    /**
+     * 获取指定名称的数据库配置
+     * @param name
+     * @return 
+     */
     @Override
     public DbConfig getDbConfig(String name) {
-        return new DbConfig(driver, url.replaceFirst("test", name), user, pass, name);
+        return DBCONFIGS.get(name);
     }
-
+    /**
+     * 是否输出数据库
+     * @return 
+     */
     @Override
     public boolean sqlOut() {
         return true;
     }
-
+    /**
+     * 是否预处理
+     * @return 
+     */
     @Override
     public boolean prepare() {
+        return true;
+    }
+    /**
+     * 是否开启事务
+     * @return 
+     */
+    @Override
+    public boolean tranceaction() {
         return true;
     }
 

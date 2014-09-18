@@ -17,33 +17,55 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- *
- * @author bin
+ * 数据库连接管理器.
+ * @author hyberbin
  */
 public abstract class ADbManager implements IDbManager {
 
     protected Logger log = LoggerManager.getLogger(getClass());
     protected Connection connection;
-
-    protected IConfigurator configurator=new SimpleConfigurator();
-
+    protected String defaultConfig = DbConfig.DEFAULT_CONFIG_NAME;
+    protected IConfigurator configurator = SimpleConfigurator.INSTANCE;
+    /**
+     * 数据库名称.
+     * @param defaultConfig 
+     */
+    public ADbManager(String defaultConfig) {
+        this.defaultConfig = defaultConfig;
+    }
+    /**
+     * 获取默认数据连接.
+     * @return 
+     */
     @Override
     public Connection getConnection() {
-        return connection==null?getConnection(configurator.getDefaultConfig()):connection;
+        return getConnection(defaultConfig);
     }
-
-    @Override
-    public Connection getConnection(String name) {
+    /**
+     * 获取指定数据库连接.
+     * @param name
+     * @return 
+     */
+    protected Connection getConnection(String name) {
         return getConnection(configurator.getDbConfig(name));
     }
-
-    @Override
-    public Connection getConnection(DbConfig config) {
+    /**
+     * 获取指定数据库配置的连接.
+     * @param config
+     * @return 
+     */
+    protected Connection getConnection(DbConfig config) {
         return getConnection(config.getDriver(), config.getUrl(), config.getUsername(), config.getPassword());
     }
-
-    @Override
-    public Connection getConnection(String driver, String url, String username, String password) {
+    /**
+     * 用相关参数获取数据库连接.
+     * @param driver 驱动
+     * @param url 地址
+     * @param username 用户名
+     * @param password 密码
+     * @return 
+     */
+    protected Connection getConnection(String driver, String url, String username, String password) {
         NullUtils.validateNull(driver, "driver");
         NullUtils.validateNull(driver, "url");
         NullUtils.validateNull(driver, "username");
@@ -52,6 +74,7 @@ public abstract class ADbManager implements IDbManager {
         try {
             Class.forName(driver);
             connection = DriverManager.getConnection(url, username, password);
+            openTransaction();
         } catch (ClassNotFoundException ex) {
             log.error("数据库连接错误\t找不到驱动", ex);
         } catch (SQLException ex) {
@@ -59,10 +82,55 @@ public abstract class ADbManager implements IDbManager {
         }
         return connection;
     }
-
+    /**
+     * 设置数据库的配置管理器.
+     * @param configurator 
+     */
     @Override
     public void setConfigurator(IConfigurator configurator) {
         this.configurator = configurator;
+    }
+    /**
+     * 提交事务.
+     * @throws SQLException 
+     */
+    @Override
+    public void commit() throws SQLException {
+        log.debug("commit");
+        if (connection != null&&configurator.tranceaction()) {
+            connection.commit();
+        }
+    }
+    /**
+     * 开启事务.
+     * @throws SQLException 
+     */
+    @Override
+    public void openTransaction() throws SQLException {
+        if (!connection.isClosed()&&configurator.tranceaction()) {
+            log.debug("open Transaction,setAutoCommit false");
+            connection.setAutoCommit(false);
+        }
+    }
+    /**
+     * 回滚事务.
+     * @throws SQLException 
+     */
+    @Override
+    public void rollBack() throws SQLException {
+        if (!connection.isClosed()&&configurator.tranceaction()) {
+            log.debug("transaction rollback");
+            connection.rollback();
+        }
+    }
+    /**
+     * 最终关闭数据库连接.
+     * 用于整个项目只用一个连接或者一个线程用一个连接的情况.
+     * @throws SQLException 
+     */
+    @Override
+    public void finalCloseConnection() throws SQLException {
+        log.debug("finalCloseConnection do nothing!");
     }
 
 }

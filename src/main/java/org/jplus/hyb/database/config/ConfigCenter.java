@@ -1,6 +1,3 @@
-/*
- * 下面几行值不要动，请到缺省包下面database.properties去配置
- */
 package org.jplus.hyb.database.config;
 
 import org.jplus.hyb.database.adapter.IAdapter;
@@ -28,7 +25,7 @@ public class ConfigCenter {
     /** 配置文件读取器 */
     private IConfigurator configurator;
     /** 事务管理器* */
-    private String manager;
+    private IDbManager manager;
     /** sql语句输出器 */
     private String sqlout;
     /** 数据操作适配器 */
@@ -38,9 +35,9 @@ public class ConfigCenter {
      * 私有构造方法禁止外部创建
      */
     private ConfigCenter() {
-        configurator = new SimpleConfigurator();
+        configurator = SimpleConfigurator.INSTANCE;
         log.info("use configurator:{}", configurator.getClass().getName());
-        manager = SimpleManager.class.getName();
+        manager = new SimpleManager(DbConfig.DEFAULT_CONFIG_NAME);
         log.info("use database manager:{}", manager);
         adapter = MysqlAdapter.class.getName();
         log.info("use database adapter:{}", adapter);
@@ -57,18 +54,18 @@ public class ConfigCenter {
         return configurator;
     }
 
-    public void setManager(String manager) {
+    public void setManager(String manager,String configName) {
+        this.manager = (IDbManager) Reflections.instance(manager,new Class[]{String.class},new Object[]{configName});
+        log.info("use database manager:{},defaultConfigName", manager,configName);
+    }
+
+    public void setManager(IDbManager manager) {
         this.manager = manager;
         log.info("use database manager:{}", manager);
     }
 
-    public void setManager(IDbManager manager) {
-        this.manager = manager.getClass().getName();
-        log.info("use database manager:{}", manager);
-    }
-
     public IDbManager getManager() {
-        IDbManager manager = (IDbManager) Reflections.instance(this.manager);
+        IDbManager manager = this.manager.newInstance();
         manager.setConfigurator(getConfigurator());
         return manager;
     }

@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.jplus.hyb.database.config;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import org.jplus.hyb.log.Logger;
@@ -14,7 +10,16 @@ import org.jplus.util.LoadProperties;
 import org.jplus.util.NullUtils;
 
 /**
- *
+ * 从properties文件中读取数据相关配置文件. <br/>
+ * 例如： driver=com.mysql.jdbc.Driver.<br/>
+ * url=jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true.<br/>
+ * user=root.<br/>
+ * pass=root.<br/>
+ * sqlout=true.<br/>
+ * prepare=true.<br/>
+ * tranceaction=true.<br/>
+ * 如果有多个数据则在driver,url,user,pass前加上配置名称.<br/>
+ * 如：name-driver,name-url...
  * @author Hyberbin
  */
 public class PropConfigurator implements IConfigurator {
@@ -24,19 +29,24 @@ public class PropConfigurator implements IConfigurator {
     private final static Map<String, DbConfig> configMap = new HashMap<String, DbConfig>();
     private Boolean sqlout;
     private Boolean prepare;
+    private Boolean tranceaction;
 
-    public PropConfigurator(String dbProp, String fieldProp, String typeProp) {
-        dbProperties = new LoadProperties(dbProp);
+    public PropConfigurator(String proptiesPath) {
+        dbProperties = new LoadProperties(proptiesPath);
     }
 
-    public PropConfigurator() {
-        try {
-            dbProperties = new LoadProperties(PropConfigurator.class.getClassLoader().getResource("database.properties").openStream());
-        } catch (IOException ex) {
-            log.error("获取默认配置文件失败", ex);
-        }
+    public PropConfigurator(InputStream inputStream) {
+        dbProperties = new LoadProperties(inputStream);
     }
 
+    public PropConfigurator() throws IOException {
+        this(PropConfigurator.class.getClassLoader().getResource("database.properties").openStream());
+    }
+
+    /**
+     * 获取默认的数据连接
+     * @return
+     */
     @Override
     public DbConfig getDefaultConfig() {
         log.trace("in getDefaultConfig");
@@ -49,6 +59,11 @@ public class PropConfigurator implements IConfigurator {
         return defaultDbConfig;
     }
 
+    /**
+     * 获取指定名称的数据连接
+     * @param name
+     * @return
+     */
     @Override
     public DbConfig getDbConfig(String name) {
         log.trace("in DbConfig");
@@ -62,6 +77,10 @@ public class PropConfigurator implements IConfigurator {
         return DbConfig;
     }
 
+    /**
+     * 是否输出SQL语句
+     * @return
+     */
     @Override
     public boolean sqlOut() {
         log.trace("in sqlOut");
@@ -72,6 +91,10 @@ public class PropConfigurator implements IConfigurator {
         return sqlout;
     }
 
+    /**
+     * 是否使用预处理
+     * @return
+     */
     @Override
     public boolean prepare() {
         log.trace("in prepare");
@@ -81,4 +104,15 @@ public class PropConfigurator implements IConfigurator {
         log.debug("prepare is :{}", prepare);
         return prepare;
     }
+
+    @Override
+    public boolean tranceaction() {
+        log.trace("in tranceaction");
+        if (tranceaction == null) {
+            tranceaction = dbProperties.getBoolProperties("tranceaction");
+        }
+        log.debug("tranceaction is :{}", tranceaction);
+        return tranceaction;
+    }
+
 }

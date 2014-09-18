@@ -1,8 +1,3 @@
-/**
- * @date 2012/2/19 15:10 添加事务处理，重复使用的方法
- * @date 2012/4/13 14:10
- * @date 2012/8/6 添加延迟加载 自动关联查询 结果集从LinkedList改成ArrayList
- */
 package org.jplus.hyb.database.crud;
 
 import java.lang.reflect.Field;
@@ -31,15 +26,12 @@ import org.jplus.util.NumberUtils;
 import org.jplus.util.Reflections;
 
 /**
- * 数据库持久层框架核心类之一 此类用于给定POJO类的数据库操作 强制绑定了数据库预处理机制。
- * 需要在项目缺省包下面添加配置文件properties(整个项目仅此一个数据库配置)。
- * 多用于对数据库单表的插入、更新、删除、查询操作，对POJO类的依赖性很强。 可以支持数据库事务处理。 支持一个数据库连接的单次，多次利用。
- *
- * @version 3.6
- * @param <T>
+ * 数据库持久层框架核心类之一 此类用于给定POJO类的数据库操作.
+ * 多用于对数据库单表的插入、更新、删除、查询操作，对POJO类的依赖性很强。支持数据库事务处理。.
+ * @param <T> POJO类
  * @author hyberbin
  */
-public class Hyberbin<T> extends BaseDbTool{
+public class Hyberbin<T> extends BaseDbTool {
 
     /** 表名 */
     private String tableName;
@@ -71,6 +63,10 @@ public class Hyberbin<T> extends BaseDbTool{
         }
     }
 
+    /**
+     * 获取POJO对象. 可能已经用查询到的数据填充到对象中了.
+     * @return
+     */
     private T getPo() {
         if (po == null) {
             log.error("po值为空，注意：空构造方法不能执行此操作");
@@ -79,29 +75,27 @@ public class Hyberbin<T> extends BaseDbTool{
     }
 
     /**
-     * 构造方法,一次性操作。操作完后自动关闭数据库. Ex:News news=new News();//POJO类，源自于数据库
-     * <strong>
-     * Hyberbin hyberbin=new Hyberbin(news);
-     * //构建Hyberbin,给出POJO类表示当前只对news表进行操作，而且是一次性操作。操作完后自动关闭数据库。
-     * </strong>
-     * @param tablebean 表的实体类
+     * 构造方法. 如果所传参数只是事务管理器那么部分方法不可用.
+     * @param tablebean 表的实体类或者事务管理器
      */
     public Hyberbin(T tablebean) {
-        super(tablebean instanceof IDbManager?(IDbManager)tablebean: ConfigCenter.INSTANCE.getManager());//数据库操作对象
-        if(!(tablebean instanceof IDbManager)){
+        super(tablebean instanceof IDbManager ? (IDbManager) tablebean : ConfigCenter.INSTANCE.getManager());//数据库操作对象
+        if (!(tablebean instanceof IDbManager)) {
             ini(tablebean);
         }
     }
 
+    /**
+     * 用默认的事务管理器构造.
+     */
     public Hyberbin() {
         super(ConfigCenter.INSTANCE.getManager());//数据库操作对象
     }
 
     /**
-     * 用自带的数据库连接进行数据库操作,用于构造可多次使用的Hyberbin.
-     * <strong>本构造方法会自动开启事务.</strong>
+     * 用自带的事务管理器进行数据库操作.
      * @param tablebean 表的实体类
-     * @param tx 数据库连接
+     * @param tx 事务管理器
      */
     public Hyberbin(T tablebean, IDbManager tx) {
         super(tx);//数据库操作对象
@@ -191,7 +185,9 @@ public class Hyberbin<T> extends BaseDbTool{
     private Object loadData(Object table, ResultSet rs) throws Exception {
         log.trace("in loadData");
         for (FieldColumn fieldColumn : fields) {
-            if(fieldColumn.isIgnore())continue;
+            if (fieldColumn.isIgnore()) {
+                continue;
+            }
             Field field = fieldColumn.getField();
             if (field.isAnnotationPresent(JoinColumn.class)) {//存在字段是外键的注解
                 log.trace("has joinColumn field:{}", field.getName());
@@ -246,17 +242,17 @@ public class Hyberbin<T> extends BaseDbTool{
             getResultSet = rs.getObject(fieldColumn.getColumn(), type);
         }
         log.trace("loaded Data object:{},field:{},column:{},value:{}", table.getClass().getSimpleName(), fieldColumn.getField().getName(), fieldColumn.getColumn(), getResultSet);
-        if(fieldColumn.isHasGetterAndSetter()){
-            log.trace("Class {} has getter and setter,use local getter and setter",table.getClass());
+        if (fieldColumn.isHasGetterAndSetter()) {
+            log.trace("Class {} has getter and setter,use local getter and setter", table.getClass());
             Reflections.invokeSetter(table, fieldColumn.getField().getName(), getResultSet, type);
-        }else{
-            log.trace("Class {} do not has getter and setter,use local getter and setter",table.getClass());
+        } else {
+            log.trace("Class {} do not has getter and setter,use local getter and setter", table.getClass());
             try {
                 fieldColumn.getField().set(table, getResultSet);
             } catch (IllegalArgumentException ex) {
                 Logger.getLogger(Hyberbin.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IllegalAccessException ex) {
-                log.error("Class {} do not have setter and getter and set value error!",table.getClass(), ex);
+                log.error("Class {} do not have setter and getter and set value error!", table.getClass(), ex);
             }
         }
     }
@@ -339,9 +335,8 @@ public class Hyberbin<T> extends BaseDbTool{
     }
 
     /**
-     * 数据库插入. 此方法用于对数据库单表的插入操作，默认情况下不插入字段值为空的字段. 此方法已经默认采用预处理技术.
-     * 传入的参数是字段名而不是字段值. Ex: News news=new News();//POJO类，源自于数据库. Hyberbin
-     * hyberbin=new
+     * 数据库插入. 此方法用于对数据库单表的插入操作，默认情况下不插入字段值为空的字段. 传入的参数是字段名而不是字段值. Ex: News
+     * news=new News();//POJO类. Hyberbin hyberbin=new
      * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，而且是一次性操作。操作完后自动关闭数据库。
      * news.setNewsType(2); news.setContent("这是一则新闻！");
      * <strong><p>
@@ -362,7 +357,7 @@ public class Hyberbin<T> extends BaseDbTool{
     }
 
     /**
-     * 数据库更新. 此方法用于对数据库单表的修改操作，默认情况下不修改字段值为空的字段. 此方法已经默认采用预处理技术.
+     * 数据库更新. 此方法用于对数据库单表的修改操作，默认情况下不修改字段值为空的字段. 
      * 传入的参数是字段名而不是字段值. Ex: News news=new News();//POJO类，源自于数据库. Hyberbin
      * hyberbin=new
      * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，而且是一次性操作。操作完后自动关闭数据库.
@@ -390,12 +385,8 @@ public class Hyberbin<T> extends BaseDbTool{
 
     /**
      * 给指定字段指定条件的语句自增. 此方法用于给指定字段指定条件的语句自动加1操作，例如用户看一则新闻后点击量自动加1;
-     * 此方法默认不会使用sql预处理技术. 参数where中应该包含“where”关键字.
-     * 建议用户自己使用预处理技术（addParameter("……")）以提高安全性. Ex: Hyberbin hyberbin=new
-     * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，操作完后自动关闭数据库。
-     * hyberbin.addParameter(1);
-     * <strong><p>
-     * hyberbin.autoUp("clickTimes","where id=?");</strong>
+     * 参数where中应该包含“where”关键字.
+     * hyberbin.autoUp("clickTimes","where id=?");
      * @param field 要自增的字段
      * @param where 条件 含有“where”
      * @return 是否成功
@@ -411,12 +402,8 @@ public class Hyberbin<T> extends BaseDbTool{
     }
 
     /**
-     * 数据库删除. 此方法默认不会使用sql预处理技术. 参数where中应该包含“where”关键字.
-     * 建议用户自己使用预处理技术（addParameter("……")）以提高安全性. Ex: Hyberbin hyberbin=new
-     * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，操作完后自动关闭数据库。
-     * hyberbin.addParameter(1);
-     * <strong><p>
-     * hyberbin.dell("where id=?");//删除id为1的新闻</strong>
+     * 数据库删除. 参数where中应该包含“where”关键字.
+     * hyberbin.dell("where id=?");//删除id为1的新闻
      * @param where 要删除的条件 含有“where”
      * @return 是否成功
      * @throws java.sql.SQLException
@@ -430,12 +417,8 @@ public class Hyberbin<T> extends BaseDbTool{
     }
 
     /**
-     * 根据键值删除一条数据. 此方法默认使用sql预处理技术. 用户只需要提供关键字段的字段名即可。注意：参数是字段名. Ex: Hyberbin
-     * hyberbin=new
-     * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，操作完后自动关闭数据库.
-     * hyberbin.addParameter(1);
-     * <strong><p>
-     * hyberbin.dellOneByKey("id");//删除id为1的新闻</strong>
+     * 根据键值删除一条数据.用户只需要提供关键字段的字段名即可。注意：参数是字段名. Ex: Hyberbin
+     * hyberbin.dellOneByKey("id");//删除id为1的新闻
      * @param key 键值
      * @return 是否成功
      * @throws java.sql.SQLException
@@ -453,12 +436,8 @@ public class Hyberbin<T> extends BaseDbTool{
 
     /**
      * 根据指定SQL语句查询一条数据. 此方法用于对数据库单表的查询操作，用于用户自己提供sql语句.
-     * 此方法返回的是Object对象，用户需要自行强制类型转换. 此方法默认不会使用sql预处理技术.
      * 建议用户自己使用预处理技术（addParameter("……")）以提高安全性. Ex: Hyberbin hyberbin=new
-     * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，操作完后自动关闭数据库.
-     * hyberbin.addParameter(2);
-     * <strong><p>
-     * hyberbin.showOne("select * from news where id=?"); //查询id为2的新闻</strong>
+     * hyberbin.showOne("select * from news where id=?"); //查询id为2的新闻
      * @param sql 指定SQL语句
      * @return 查询对象
      * @throws java.sql.SQLException
@@ -469,7 +448,6 @@ public class Hyberbin<T> extends BaseDbTool{
         tx.closeConnection();
         return getPo();
     }
-
     private T showOneWithoutTx(String sql) throws SQLException {
         log.trace("in showOneWithoutTx");
         ResultSet rs = adapter.findSingle(createStatement(sql), sql);//执行查询
@@ -491,12 +469,7 @@ public class Hyberbin<T> extends BaseDbTool{
 
     /**
      * 通过指定字段查询一条数据. 此方法用于对数据库单表的查询操作，用于只提供关键的字段名信息.
-     * 此方法返回的是Object对象，用户需要自行强制类型转换. 此方法默认使用sql预处理技术. Ex: news.setId(2);
-     * Hyberbin hyberbin=new
-     * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，操作完后自动关闭数据库.
-     * <strong><p>
-     * hyberbin.showOnebyKey("id"); //查询id为2的新闻.</strong>
-     * 如果有缓存会自动从缓存中取出对象并克隆到tablebean.
+     * hyberbin.showOnebyKey("id"); //查询id为2的新闻.
      * @param key
      * @return 查询对象
      * @throws java.sql.SQLException
@@ -513,10 +486,8 @@ public class Hyberbin<T> extends BaseDbTool{
     }
 
     /**
-     * 数据库批量查询. 此方法查询一个表的所有记录，不常用. 此方法返回的是 List，用户需要自行强制类型转换. Ex: Hyberbin
-     * hyberbin=new Hyberbin(news);
-     * <strong><p>
-     * hyberbin.showAll();</strong>
+     * 数据库批量查询. 此方法查询一个表的所有记录
+     * hyberbin.showAll();
      * @return 查询结果集合
      * @throws java.sql.SQLException
      */
@@ -529,32 +500,23 @@ public class Hyberbin<T> extends BaseDbTool{
     }
 
     /**
-     * 数据库批量查询. 此方法查询一个表的所有记录，不常用. 此方法返回的是 List，用户需要自行强制类型转换. Ex: Hyberbin
-     * hyberbin=new Hyberbin(news);
-     * <strong><p>
-     * hyberbin.showAll();</strong>
+     * 数据库批量查询. 此方法查询一个表的所有记录，不常用.
+     * hyberbin.showAll("where type=1 ");
+     * @param where 查询条件
      * @return 查询结果集合
      * @throws java.sql.SQLException
      */
     public List<T> showAll(String where) throws SQLException {
         log.trace("in showAll (String where) ");
-        String sql = "select " + getFieldList() + " from " + tableName+" "+where;
+        String sql = "select " + getFieldList() + " from " + tableName + " " + where;
         List showListWithoutTx = showListWithoutTx(sql);
         tx.closeConnection();
         return showListWithoutTx;
     }
 
     /**
-     * 查询数据库中符合条件的记录数. 此方法用于查询符合用户条件的数据记录条数. 参数where中应该包含“where”关键字.
-     * 此方法默认不使用sql预处理技术. 建议用户自己使用预处理技术（addParameter("……")）以提高安全性. Ex: Hyberbin
-     * hyberbin=new
-     * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，操作完后自动关闭数据库.
-     * hyberbin.addParameter(2);
-     * <strong><p>
-     * hyberbin.getCount("where newstype=?"); //查询newstype为2的新闻有多少条</strong>
-     * <strong><p>
-     * hyberbin.getCount(""); //查询news表的所有</strong>
-     * @param sql
+     * 查询指定sql查询结果的记录数. 
+     * @param sql 一条完整的SQL语句.
      * @return
      * @throws java.sql.SQLException
      * @
@@ -568,12 +530,8 @@ public class Hyberbin<T> extends BaseDbTool{
     }
 
     /**
-     * 分页查询. 参数where中应该包含“where”关键字. 此方法默认不使用sql预处理技术.
-     * 建议用户自己使用预处理技术（addParameter("……")）以提高安全性. Ex: Pagger pagger=new
-     * Pagger(10);//页面大小为10。 Hyberbin hyberbin=new
-     * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，操作完后自动关闭数据库.
-     * hyberbin.addParameter(2); <strong>
-     * hyberbin.showByMySqlPage("where newstype=?",pagger);</strong>
+     * 分页查询. 参数where中应该包含“where”关键字. 
+     * hyberbin.showByMySqlPage("where newstype=?",pagger);
      * @param where 查询条件 含有“where”.
      * @param pager 分页对象
      * @throws java.sql.SQLException
@@ -592,13 +550,8 @@ public class Hyberbin<T> extends BaseDbTool{
 
     /**
      * 数据库的批量查询. 此方法用于对数据库单表的查询操作，用于用户自己提供sql语句. 由于是自己构造sql语句所以适用于所有数据库.
-     * 此方法默认不会使用sql预处理技术. 建议用户自己使用预处理技术（addParameter("……")）以提高安全性. Ex: Hyberbin
-     * hyberbin=new
-     * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，而且是一次性操作。操作完后自动关闭数据库.
-     * hyberbin.addParameter(2);
-     * <strong><p>
-     * hyberbin.showList("select * from news where newstype=?");</strong>
-     * @param sql
+     * hyberbin.showList("select * from news where newstype=?");
+     * @param sql 完整的sql语句
      * @return 查询结果集合
      * @throws java.sql.SQLException
      */
@@ -614,7 +567,12 @@ public class Hyberbin<T> extends BaseDbTool{
         ResultSet rs = adapter.findList(createStatement(sql), sql);//执行查询
         return loadListData(getPo(), rs);
     }
-
+    /**
+     * 将查询的结果存放到List中list的每个节点都是Map.
+     * @param rs 查询的结果.
+     * @return
+     * @throws SQLException 
+     */
     private List<Map> getMapList(ResultSet rs) throws SQLException {
         List<Map> list = new ArrayList<Map>();
         if (rs != null) {
@@ -631,7 +589,12 @@ public class Hyberbin<T> extends BaseDbTool{
         }
         return list;
     }
-
+    /**
+     * 将查询的结果存放到List中list的每个节点都是Map.
+     * @param sql 完整的SQL语句.
+     * @return
+     * @throws SQLException 
+     */
     public List<Map> getMapList(String sql) throws SQLException {
         List<Map> mapList = getMapList(adapter.findList(createStatement(sql), sql));
         tx.closeConnection();
@@ -640,6 +603,7 @@ public class Hyberbin<T> extends BaseDbTool{
 
     /**
      * 根据SQL语句查出一个map集合.
+     * 数据对象直接放在pager中.
      * @param sql SQL语句
      * @param pager 分页对象
      * @throws java.sql.SQLException
