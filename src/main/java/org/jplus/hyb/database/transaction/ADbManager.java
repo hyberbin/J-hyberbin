@@ -5,16 +5,15 @@
  */
 package org.jplus.hyb.database.transaction;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import org.jplus.hyb.database.config.DbConfig;
 import org.jplus.hyb.database.config.IConfigurator;
 import org.jplus.hyb.database.config.SimpleConfigurator;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
 import org.jplus.util.NullUtils;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 /**
  * 数据库连接管理器.

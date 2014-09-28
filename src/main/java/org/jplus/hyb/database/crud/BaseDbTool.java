@@ -6,8 +6,6 @@
 package org.jplus.hyb.database.crud;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import org.jplus.hyb.database.adapter.IAdapter;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.transaction.IDbManager;
@@ -28,16 +26,6 @@ public abstract class BaseDbTool {
 
     protected BaseDbTool(IDbManager tx) {
         this.tx = tx;
-    }
-
-    /**
-     * 创建预处理对象.
-     * @param sql 预处理语句.
-     * @return
-     * @throws java.sql.SQLException
-     */
-    protected Statement createStatement(String sql) throws SQLException {
-        return adapter.createStatement(getConnection(), sql);
     }
 
     /**

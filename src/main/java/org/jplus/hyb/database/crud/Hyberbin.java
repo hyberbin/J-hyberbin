@@ -14,11 +14,11 @@ import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import org.jplus.hyb.database.util.CacheFactory;
 import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.bean.TableBean;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.transaction.IDbManager;
+import org.jplus.hyb.database.util.CacheFactory;
 import org.jplus.hyb.database.util.GetSql;
 import org.jplus.hyb.database.util.Pager;
 import org.jplus.util.FieldUtil;
@@ -175,6 +175,13 @@ public class Hyberbin<T> extends BaseDbTool {
         } else {
             return "";
         }
+    }
+    /**
+     * 返回所有的字段信息
+     * @return 
+     */
+    public List<FieldColumn> getFieldColumns(){
+        return fields;
     }
 
     /**
@@ -351,15 +358,14 @@ public class Hyberbin<T> extends BaseDbTool {
         removeField(primarkey);
         GetSql gs = getSql();
         String sql = gs.getInsert(tableName);//生成sql语句
-        int update = adapter.update(createStatement(sql), sql);
+        int update = adapter.update(getConnection(), sql);
         tx.closeConnection();
         return update;
     }
 
     /**
-     * 数据库更新. 此方法用于对数据库单表的修改操作，默认情况下不修改字段值为空的字段. 
-     * 传入的参数是字段名而不是字段值. Ex: News news=new News();//POJO类，源自于数据库. Hyberbin
-     * hyberbin=new
+     * 数据库更新. 此方法用于对数据库单表的修改操作，默认情况下不修改字段值为空的字段. 传入的参数是字段名而不是字段值. Ex: News
+     * news=new News();//POJO类，源自于数据库. Hyberbin hyberbin=new
      * Hyberbin(news);//构建Hyberbin,给出POJO类表示当前只对news表进行操作，而且是一次性操作。操作完后自动关闭数据库.
      * news.setId(1); news.setNewsType(2); news.setContent("这是一则新闻！");
      * <strong><p>
@@ -378,15 +384,14 @@ public class Hyberbin<T> extends BaseDbTool {
         adapter.addParameter(PKvalue);
         gs.add(getQuotedItem(fieldColumn.getColumn()), "?", "where");//生成sql的where部分
         String sql = gs.getUpdate(tableName);//生成sql语句
-        int update = adapter.update(createStatement(sql), sql);
+        int update = adapter.update(getConnection(), sql);
         tx.closeConnection();
         return update;
     }
 
     /**
      * 给指定字段指定条件的语句自增. 此方法用于给指定字段指定条件的语句自动加1操作，例如用户看一则新闻后点击量自动加1;
-     * 参数where中应该包含“where”关键字.
-     * hyberbin.autoUp("clickTimes","where id=?");
+     * 参数where中应该包含“where”关键字. hyberbin.autoUp("clickTimes","where id=?");
      * @param field 要自增的字段
      * @param where 条件 含有“where”
      * @return 是否成功
@@ -396,14 +401,13 @@ public class Hyberbin<T> extends BaseDbTool {
         log.trace("in autoUp");
         FieldColumn fieldColumn = FieldUtil.getFieldColumnByCache(FieldUtil.getField(getPo().getClass(), field));
         String sql = "update  " + getQuotedItem(tableName) + " set " + getQuotedItem(fieldColumn.getColumn()) + "=" + getQuotedItem(field) + "+1 " + where;
-        int update = adapter.update(createStatement(sql), sql);
+        int update = adapter.update(getConnection(), sql);
         tx.closeConnection();
         return update;
     }
 
     /**
-     * 数据库删除. 参数where中应该包含“where”关键字.
-     * hyberbin.dell("where id=?");//删除id为1的新闻
+     * 数据库删除. 参数where中应该包含“where”关键字. hyberbin.dell("where id=?");//删除id为1的新闻
      * @param where 要删除的条件 含有“where”
      * @return 是否成功
      * @throws java.sql.SQLException
@@ -411,7 +415,7 @@ public class Hyberbin<T> extends BaseDbTool {
     public int delete(String where) throws SQLException {
         log.trace("in delete");
         String sql = "delete from " + getQuotedItem(tableName) + " " + where;
-        int update = adapter.update(createStatement(sql), sql);
+        int update = adapter.update(getConnection(), sql);
         tx.closeConnection();
         return update;
     }
@@ -429,7 +433,7 @@ public class Hyberbin<T> extends BaseDbTool {
         String sql = "delete from " + getQuotedItem(tableName) + " where " + fieldColumn.getColumn() + " =?";
         Object PKvalue = FieldUtil.getFieldValue(getPo(), key);
         adapter.addParameter(PKvalue);
-        int update = adapter.update(createStatement(sql), sql);
+        int update = adapter.update(getConnection(), sql);
         tx.closeConnection();
         return update;
     }
@@ -448,9 +452,10 @@ public class Hyberbin<T> extends BaseDbTool {
         tx.closeConnection();
         return getPo();
     }
+
     private T showOneWithoutTx(String sql) throws SQLException {
         log.trace("in showOneWithoutTx");
-        ResultSet rs = adapter.findSingle(createStatement(sql), sql);//执行查询
+        ResultSet rs = adapter.findSingle(getConnection(), sql);//执行查询
         try {
             if (rs != null && rs.next()) {
                 loadData(getPo(), rs);
@@ -486,8 +491,7 @@ public class Hyberbin<T> extends BaseDbTool {
     }
 
     /**
-     * 数据库批量查询. 此方法查询一个表的所有记录
-     * hyberbin.showAll();
+     * 数据库批量查询. 此方法查询一个表的所有记录 hyberbin.showAll();
      * @return 查询结果集合
      * @throws java.sql.SQLException
      */
@@ -500,8 +504,7 @@ public class Hyberbin<T> extends BaseDbTool {
     }
 
     /**
-     * 数据库批量查询. 此方法查询一个表的所有记录，不常用.
-     * hyberbin.showAll("where type=1 ");
+     * 数据库批量查询. 此方法查询一个表的所有记录，不常用. hyberbin.showAll("where type=1 ");
      * @param where 查询条件
      * @return 查询结果集合
      * @throws java.sql.SQLException
@@ -515,7 +518,7 @@ public class Hyberbin<T> extends BaseDbTool {
     }
 
     /**
-     * 查询指定sql查询结果的记录数. 
+     * 查询指定sql查询结果的记录数.
      * @param sql 一条完整的SQL语句.
      * @return
      * @throws java.sql.SQLException
@@ -524,14 +527,14 @@ public class Hyberbin<T> extends BaseDbTool {
     public int getCount(String sql) throws SQLException {
         log.trace("in getCount");
         sql = "select count(*) from (" + sql + ") as count";
-        Object findUnique = adapter.findUnique(createStatement(sql), sql);
+        Object findUnique = adapter.findUnique(getConnection(), sql);
         tx.closeConnection();
         return NumberUtils.parseInt(findUnique);
     }
 
     /**
-     * 分页查询. 参数where中应该包含“where”关键字. 
-     * hyberbin.showByMySqlPage("where newstype=?",pagger);
+     * 分页查询. 参数where中应该包含“where”关键字. hyberbin.showByMySqlPage("where
+     * newstype=?",pagger);
      * @param where 查询条件 含有“where”.
      * @param pager 分页对象
      * @throws java.sql.SQLException
@@ -539,10 +542,10 @@ public class Hyberbin<T> extends BaseDbTool {
     public void showByPage(String where, Pager pager) throws SQLException {
         log.trace("in showByPage");
         String sql = "select " + getFieldList() + "  from " + getQuotedItem(tableName) + " " + where;
-        ResultSet rs = adapter.findPageList(createStatement(sql), pager, sql);
+        ResultSet rs = adapter.findPageList(getConnection(), sql, pager);
         List list = loadListData(getPo(), rs);
         sql = "select count(*) from (" + sql + ") as count";
-        Object findUnique = adapter.findUnique(createStatement(sql), sql);
+        Object findUnique = adapter.findUnique(getConnection(), sql);
         pager.setItems(NumberUtils.parseInt(findUnique));
         pager.setData(list);
         tx.closeConnection();
@@ -564,23 +567,27 @@ public class Hyberbin<T> extends BaseDbTool {
 
     private List<T> showListWithoutTx(String sql) throws SQLException {
         log.trace("in showListWithoutTx");
-        ResultSet rs = adapter.findList(createStatement(sql), sql);//执行查询
+        ResultSet rs = adapter.findList(getConnection(), sql);//执行查询
         return loadListData(getPo(), rs);
     }
+
     /**
      * 将查询的结果存放到List中list的每个节点都是Map.
      * @param rs 查询的结果.
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
     private List<Map> getMapList(ResultSet rs) throws SQLException {
         List<Map> list = new ArrayList<Map>();
         if (rs != null) {
-            ResultSetMetaData metaData;
-            metaData = rs.getMetaData();
+            ResultSetMetaData metaData= rs.getMetaData();
             int columnCount = metaData.getColumnCount();
+            fields = new ArrayList<FieldColumn>(columnCount);
+            for(int i=1;i<=columnCount;i++){
+                fields.add(new FieldColumn(null, metaData.getColumnName(i), 0, false, true));
+            }
             while (rs.next()) {
-                Map map = new MyMap();
+                Map<String,Object> map = new MyMap<String,Object>();
                 for (int i = 1; i <= columnCount; i++) {
                     map.put(metaData.getColumnName(i), rs.getObject(i));
                 }
@@ -589,30 +596,30 @@ public class Hyberbin<T> extends BaseDbTool {
         }
         return list;
     }
+
     /**
      * 将查询的结果存放到List中list的每个节点都是Map.
      * @param sql 完整的SQL语句.
      * @return
-     * @throws SQLException 
+     * @throws SQLException
      */
     public List<Map> getMapList(String sql) throws SQLException {
-        List<Map> mapList = getMapList(adapter.findList(createStatement(sql), sql));
+        List<Map> mapList = getMapList(adapter.findList(getConnection(), sql));
         tx.closeConnection();
         return mapList;
     }
 
     /**
-     * 根据SQL语句查出一个map集合.
-     * 数据对象直接放在pager中.
+     * 根据SQL语句查出一个map集合. 数据对象直接放在pager中.
      * @param sql SQL语句
      * @param pager 分页对象
      * @throws java.sql.SQLException
      */
     public void getMapList(String sql, Pager pager) throws SQLException {
-        ResultSet findPageList = adapter.findPageList(createStatement(sql), pager, sql);
+        ResultSet findPageList = adapter.findPageList(getConnection(), sql, pager);
         pager.setData(getMapList(findPageList));
         sql = "select count(*) from (" + sql + ") as count";
-        Object findUnique = adapter.findUnique(createStatement(sql), sql);
+        Object findUnique = adapter.findUnique(getConnection(), sql);
         pager.setItems(NumberUtils.parseInt(findUnique));
         tx.closeConnection();
     }
@@ -641,16 +648,16 @@ public class Hyberbin<T> extends BaseDbTool {
 
 }
 
-class MyMap extends HashMap<String, Object> {
+class MyMap<K, V> extends HashMap<K, V> {
 
     @Override
-    public Object put(String key, Object value) {
-        return super.put(key.toLowerCase(), value);
+    public V get(Object key) {
+        return super.get(key.toString().toLowerCase());
     }
 
     @Override
-    public Object get(Object key) {
-        return super.get((key + "").toLowerCase());
+    public V put(K key, V value) {
+        return super.put((K) key.toString().toLowerCase(), value);
     }
 
 }

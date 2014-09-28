@@ -25,7 +25,7 @@ public class LoggerManager {
     /**
      * 日志对象,默认为本地日志
      */
-    private final static Logger logger = new LocalLogger();
+    private static final Logger logger = new LocalLogger();
     private static Object logFactory = null;
     private static final Class[] ARG_TYPE = new Class[]{String.class};
     /**

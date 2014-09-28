@@ -37,12 +37,12 @@ public class AutoManager extends ADbManager {
         }
         connection = map.get(defaultConfig);
         if (!validConnection(connection)) {
-            log.trace("put connection to threadLocal");
+            log.trace("put connection:{} to threadLocal", defaultConfig);
             connection = super.getConnection();
             map.put(defaultConfig, connection);
-            log.debug("reput connection to threadLocal");
+            log.debug("reput connection:{} to threadLocal", defaultConfig);
         }
-        log.debug("get Connection from threadLocal");
+        log.debug("get Connection:{} from threadLocal", defaultConfig);
         return connection;
     }
 
@@ -55,7 +55,7 @@ public class AutoManager extends ADbManager {
         try {
             return connection != null && connection.isValid(3);
         } catch (SQLException ex) {
-            log.error("validConnection error!", ex);
+            log.error("validConnection:{} error!", ex, defaultConfig);
         }
         return false;
     }
@@ -67,7 +67,7 @@ public class AutoManager extends ADbManager {
     @Override
     final public void closeConnection() throws SQLException {
         commit();
-        log.trace("use outer manager nothing to do close just commit");
+        log.trace("use outer manager nothing to do close just commit:{}", defaultConfig);
     }
 
     /**
@@ -76,10 +76,16 @@ public class AutoManager extends ADbManager {
      */
     @Override
     public void finalCloseConnection() throws SQLException {
+        Map<String, Connection> map = threadLocal.get();
+        log.trace("config map isnull:{}", map == null);
+        if (map != null) {
+            map.remove(defaultConfig);
+            log.trace("remove config:{}", defaultConfig);
+        }
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
-        log.trace("in finalCloseConnection");
+        log.trace("in finalCloseConnection:{}", defaultConfig);
     }
 
     /**

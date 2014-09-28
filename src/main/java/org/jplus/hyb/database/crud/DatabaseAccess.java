@@ -48,7 +48,7 @@ public class DatabaseAccess extends BaseDbTool{
      * @throws java.sql.SQLException
      */
     public int update(String sql) throws SQLException {
-        int update = adapter.update(createStatement(sql), sql);
+        int update = adapter.update(getConnection(), sql);
         tx.closeConnection();
         return update;
     }
@@ -60,7 +60,7 @@ public class DatabaseAccess extends BaseDbTool{
      * @throws java.sql.SQLException
      */
     public ResultSet query(String sql) throws SQLException {
-        ResultSet findList = adapter.findList(createStatement(sql), sql);
+        ResultSet findList = adapter.findList(getConnection(), sql);
         tx.closeConnection();
         return findList;
     }
@@ -72,7 +72,7 @@ public class DatabaseAccess extends BaseDbTool{
      * @throws java.sql.SQLException
      */
     public ResultSet querySingle(String sql) throws SQLException {
-        ResultSet findSingle = adapter.findSingle(createStatement(sql), sql);
+        ResultSet findSingle = adapter.findSingle(getConnection(), sql);
         tx.closeConnection();
         return findSingle;
     }
@@ -84,7 +84,7 @@ public class DatabaseAccess extends BaseDbTool{
      * @throws java.sql.SQLException
      */
     public Object queryUnique(String sql) throws SQLException {
-        Object findUnique = adapter.findUnique(createStatement(sql), sql);
+        Object findUnique = adapter.findUnique(getConnection(), sql);
         tx.closeConnection();
         return findUnique;
     }

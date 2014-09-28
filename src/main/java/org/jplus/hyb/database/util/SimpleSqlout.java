@@ -5,7 +5,6 @@
  */
 package org.jplus.hyb.database.util;
 
-import java.sql.SQLOutput;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +16,7 @@ import org.jplus.util.ObjectHelper;
  * @author Hyberbin
  */
 public class SimpleSqlout implements ISqlout {
-    private final static SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Boolean needout;
 
     @Override

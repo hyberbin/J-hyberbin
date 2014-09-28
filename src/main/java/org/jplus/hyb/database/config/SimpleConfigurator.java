@@ -16,6 +16,9 @@ public final class SimpleConfigurator implements IConfigurator {
     static {//自动添加一个默认的配置
         addConfigurator(new DbConfig());
     }
+    private SimpleConfigurator(){
+        
+    }
     /**
      * 添加一个数据配置.
      * @param config 
@@ -64,5 +67,4 @@ public final class SimpleConfigurator implements IConfigurator {
     public boolean tranceaction() {
         return true;
     }
-
 }

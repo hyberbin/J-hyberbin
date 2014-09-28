@@ -24,9 +24,9 @@ import org.jplus.util.NullUtils;
  */
 public class PropConfigurator implements IConfigurator {
 
-    private final static Logger log = LoggerManager.getLogger(PropConfigurator.class);
-    private LoadProperties dbProperties = null;
-    private final static Map<String, DbConfig> configMap = new HashMap<String, DbConfig>();
+    private static final Logger log = LoggerManager.getLogger(PropConfigurator.class);
+    private final LoadProperties dbProperties;
+    private static final Map<String, DbConfig> configMap = new HashMap<String, DbConfig>();
     private Boolean sqlout;
     private Boolean prepare;
     private Boolean tranceaction;

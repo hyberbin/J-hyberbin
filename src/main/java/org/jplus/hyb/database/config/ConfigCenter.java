@@ -19,7 +19,7 @@ import org.jplus.util.Reflections;
  */
 public class ConfigCenter {
 
-    private final static Logger log = LoggerManager.getLogger(ConfigCenter.class);
+    private static final Logger log = LoggerManager.getLogger(ConfigCenter.class);
     public static ConfigCenter INSTANCE = new ConfigCenter();
     
     /** 配置文件读取器 */

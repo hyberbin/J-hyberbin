@@ -12,10 +12,10 @@ package org.jplus.hyb.database.config;
 public class DbConfig {
 
     public static final String DEFAULT_CONFIG_NAME = "default";
-    private final static String DRIVER = "com.mysql.jdbc.Driver";
-    private final static String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
-    private final static String USER = "root";
-    private final static String PASS = "root";
+    private static final String DRIVER = "com.mysql.jdbc.Driver";
+    private static final String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
+    private static final String USER = "root";
+    private static final String PASS = "root";
 
 
     public DbConfig(String driver, String url, String username, String password, String configName) {

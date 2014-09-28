@@ -5,11 +5,11 @@
  */
 package org.jplus.hyb.mvc.mapping;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
 import org.jplus.hyb.mvc.bean.MVCBean;
-
-import java.util.*;
 
 /**
  *
@@ -17,12 +17,12 @@ import java.util.*;
  */
 public class MappingManager implements IMappingManager {
 
-    private final static Logger log = LoggerManager.getLogger(MappingManager.class);
+    private static final Logger log = LoggerManager.getLogger(MappingManager.class);
 
-    private final static Map mapping = new MappingMap();
-    private final static Map<String, MVCBean> before = new HashMap<String, MVCBean>();
-    private final static Map<String, MVCBean> after = new HashMap<String, MVCBean>();
-    private final static String separates ="/";
+    private static final Map mapping = new MappingMap();
+    private static final Map<String, MVCBean> before = new HashMap<String, MVCBean>();
+    private static final Map<String, MVCBean> after = new HashMap<String, MVCBean>();
+    private static final String separates ="/";
 
     @Override
     public void putMapping(String url, MVCBean bean) {

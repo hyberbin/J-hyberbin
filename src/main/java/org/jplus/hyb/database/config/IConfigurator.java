@@ -6,7 +6,8 @@
 package org.jplus.hyb.database.config;
 
 /**
- * 配置文件读取器接口. 
+ * 配置文件读取器接口.
+ * 本接口的实现类都应该以单例的形式存在.
  * @author Hyberbin
  */
 public interface IConfigurator {

@@ -5,6 +5,13 @@
  */
 package org.jplus.hyb.database.util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.persistence.Table;
 import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.bean.TableBean;
 import org.jplus.hyb.log.LocalLogger;
@@ -12,21 +19,13 @@ import org.jplus.hyb.log.Logger;
 import org.jplus.util.FieldUtil;
 import org.jplus.util.ObjectHelper;
 
-import javax.persistence.Table;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * 缓存工厂
  * @author hyberbin
  */
 public class CacheFactory {
 
-    private final static Logger log = new LocalLogger();//LoggerManager.getLogger(CacheFactory.class);//此处不能用代理日志
+    private static final Logger log = new LocalLogger();//LoggerManager.getLogger(CacheFactory.class);//此处不能用代理日志
 
     /** 此对象唯一的实例 */
     public static CacheFactory MINSTANCE = new CacheFactory();

@@ -15,7 +15,6 @@ import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.config.DbConfig;
 import org.jplus.hyb.database.transaction.AutoManager;
 import org.jplus.hyb.database.transaction.IDbManager;
-import org.jplus.hyb.database.transaction.SimpleManager;
 import org.jplus.hyb.database.util.Pager;
 import org.jplus.hyb.log.LocalLogger;
 import org.jplus.hyb.log.LoggerManager;

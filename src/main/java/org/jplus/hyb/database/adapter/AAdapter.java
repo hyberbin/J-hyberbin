@@ -23,12 +23,14 @@ import org.jplus.util.ObjectHelper;
  */
 public abstract class AAdapter implements IAdapter {
 
-    protected final static Logger log = LoggerManager.getLogger(AAdapter.class);
+    protected static final Logger log = LoggerManager.getLogger(AAdapter.class);
     /** 预处理参数 */
     protected List parmeters = new ArrayList(0);
+    protected String sql;
 
-    @Override
-    public Statement createStatement(Connection conn, String sql) throws SQLException {
+    protected Statement createStatement(Connection conn, String sql) throws SQLException {
+        this.sql = sql;
+        sqlout();
         Statement stm;
         if (ConfigCenter.INSTANCE.getConfigurator().prepare()) {
             log.trace("createStatement:prepare");
@@ -59,12 +61,12 @@ public abstract class AAdapter implements IAdapter {
     }
 
     @Override
-    public void sqlout(String sql) {
+    public void sqlout() {
         if (ConfigCenter.INSTANCE.getConfigurator().sqlOut()) {
             ISqlout sqlout = ConfigCenter.INSTANCE.getSqlout();
-            if(sqlout!=null){
+            if (sqlout != null) {
                 sqlout.sqlout(sql, parmeters);
-            }else{
+            } else {
                 log.error("can't find sqlout adapter,you can set it by ConfigCenter.DEFAULT_INSTANCE.setSqlout(ISqlout sqlout)");
             }
         }

@@ -1,5 +1,17 @@
 package org.jplus.hyb.mvc.classloader;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import org.jplus.annotation.Action;
 import org.jplus.annotation.After;
 import org.jplus.annotation.Before;
@@ -12,15 +24,6 @@ import org.jplus.hyb.mvc.mapping.MappingManager;
 import org.jplus.util.FileCopyUtils;
 import org.jplus.util.Reflections;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-
 /**
  * 加载所有带有Action注释的类
  *
@@ -28,9 +31,9 @@ import java.util.jar.JarFile;
  */
 public final class ClassScanner extends ClassLoader implements IClassLoader {
 
-    private final static Logger log = LoggerManager.getLogger(ClassScanner.class);
-    private final static String[] separates = new String[]{"/","{","}"};
-    private final static Integer[] empty=new Integer[]{};
+    private static final Logger log = LoggerManager.getLogger(ClassScanner.class);
+    private static final String[] separates = new String[]{"/","{","}"};
+    private static final Integer[] empty=new Integer[]{};
     /**
      * 类名称列表
      */

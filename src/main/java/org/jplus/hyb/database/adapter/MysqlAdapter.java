@@ -5,6 +5,7 @@
  */
 package org.jplus.hyb.database.adapter;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,41 +18,43 @@ import org.jplus.hyb.database.util.Pager;
  */
 public class MysqlAdapter extends AAdapter {
 
-    private final static char[] QUOTE = new char[]{'`', '`'};
+    private static final char[] QUOTE = new char[]{'`', '`'};
+
+    
 
     @Override
-    public ResultSet findList(Statement statement, String sql) throws SQLException {
-        sqlout(sql);
-        if (statement instanceof PreparedStatement) {
-            return ((PreparedStatement) statement).executeQuery();
+    public ResultSet findList(Connection connection,String sql) throws SQLException {
+        Statement stm = createStatement(connection, sql);
+        if (stm instanceof PreparedStatement) {
+            return ((PreparedStatement) stm).executeQuery();
         } else {
-            return statement.executeQuery(sql);
+            return stm.executeQuery(sql);
         }
     }
 
     @Override
-    public ResultSet findPageList(Statement statement, Pager pager, String sql) throws SQLException {
-        return findList(statement, sql + " limit " + pager.getTop() + "," + pager.getSize());
+    public ResultSet findPageList(Connection connection,String sql,Pager pager) throws SQLException {
+        return findList(connection, sql+" limit "+pager.getTop()+","+pager.getSize());
     }
 
     @Override
-    public ResultSet findSingle(Statement statement, String sql) throws SQLException {
-        return findList(statement, sql + " limit 1");
+    public ResultSet findSingle(Connection connection,String sql) throws SQLException {
+        return findList(connection, sql+" limit 1");
     }
 
     @Override
-    public Object findUnique(Statement statement, String sql) throws SQLException {
-        ResultSet singel = findSingle(statement, sql);
+    public Object findUnique(Connection connection,String sql) throws SQLException {
+        ResultSet singel = findSingle(connection,sql);
         return singel != null && singel.next() ? singel.getObject(1) : null;
     }
 
     @Override
-    public int update(Statement statement, String sql) throws SQLException {
-        sqlout(sql);
-        if (statement instanceof PreparedStatement) {
-            return ((PreparedStatement) statement).executeUpdate();
+    public int update(Connection connection,String sql) throws SQLException {
+        Statement stm = createStatement(connection, sql);
+        if (stm instanceof PreparedStatement) {
+            return ((PreparedStatement) stm).executeUpdate();
         } else {
-            return statement.executeUpdate(sql);
+            return stm.executeUpdate(sql);
         }
     }
 

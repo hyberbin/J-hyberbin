@@ -18,7 +18,7 @@ import org.jplus.util.FieldUtil;
  * @version 1.2
  */
 public class DataGet {
-    private final static Logger log=LoggerManager.getLogger(DataGet.class);
+    private static final Logger log=LoggerManager.getLogger(DataGet.class);
     /**
      * 类型转换，将字符类型转换为字段需要的类型
      *

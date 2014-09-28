@@ -5,8 +5,8 @@ import java.lang.reflect.Method;
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
-import org.jplus.hyb.database.util.CacheFactory;
 import org.jplus.hyb.database.bean.FieldColumn;
+import org.jplus.hyb.database.util.CacheFactory;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
 
@@ -16,7 +16,7 @@ import org.jplus.hyb.log.LoggerManager;
  */
 public class FieldUtil {
     private static final Logger log = LoggerManager.getLogger(FieldUtil.class);
-    private final static Class[] EMPTY_ARG=new Class[]{};
+    private static final Class[] EMPTY_ARG=new Class[]{};
     /**
      * 取得一个成员变量的值
      * @param tablebean tablebean

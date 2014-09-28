@@ -1,7 +1,23 @@
 package org.jplus.hyb.mvc.controller;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Set;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.jplus.annotation.Before;
 import org.jplus.hyb.database.config.ConfigCenter;
+import org.jplus.hyb.database.config.DbConfig;
 import org.jplus.hyb.database.transaction.IDbManager;
 import org.jplus.hyb.log.LocalLogger;
 import org.jplus.hyb.log.Logger;
@@ -12,18 +28,6 @@ import org.jplus.hyb.mvc.classloader.IClassLoader;
 import org.jplus.util.ConverString;
 import org.jplus.util.NumberUtils;
 
-import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
-import java.util.Map;
-import java.util.Set;
-import org.jplus.hyb.database.config.DbConfig;
-
 /**
  * MVCFilter说明.
  * @author Hyberbin
@@ -31,7 +35,7 @@ import org.jplus.hyb.database.config.DbConfig;
  */
 @WebFilter(filterName = "Filter", urlPatterns = {"/*"})
 public class MVCFilter implements Filter {
-    private final static Logger log=LoggerManager.getLogger(MVCFilter.class);
+    private static final Logger log=LoggerManager.getLogger(MVCFilter.class);
     private static IClassLoader classLoader= ClassScanner.MY_INSTANCE;
 
     /**

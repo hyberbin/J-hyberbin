@@ -1,20 +1,23 @@
 package org.jplus.hyb.mvc.mapping;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
 import org.jplus.hyb.mvc.bean.MVCBean;
-
-import java.util.*;
 
 /**
  * Created by Hyberbin on 2014/7/29.
  */
 class MappingMap extends HashMap<String, Object> {
 
-    private final static Logger log = LoggerManager.getLogger(MappingMap.class);
-    private final static String[] separates = new String[]{"//", "/","{","}"};
-    private final static Set<String> keySet = new TreeSet<String>();
-    private final static Map<String,String[]> keySetSplits=new HashMap<String, String[]>();
+    private static final Logger log = LoggerManager.getLogger(MappingMap.class);
+    private static final String[] separates = new String[]{"//", "/","{","}"};
+    private static final Set<String> keySet = new TreeSet<String>();
+    private static final Map<String,String[]> keySetSplits=new HashMap<String, String[]>();
 
     private String replaceAll(String str, String old, String news) {
         while (str != null && str.contains(old)) {

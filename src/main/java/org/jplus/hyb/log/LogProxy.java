@@ -12,7 +12,7 @@ import org.jplus.util.Reflections;
 public class LogProxy implements InvocationHandler {
 
     private Object target;
-    private final static LocalLogger loglogger=new LocalLogger();
+    private static final LocalLogger loglogger=new LocalLogger();
 
     /**
      * 绑定委托对象并返回一个代理类
