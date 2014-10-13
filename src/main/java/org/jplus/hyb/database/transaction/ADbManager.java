@@ -95,9 +95,9 @@ public abstract class ADbManager implements IDbManager {
      */
     @Override
     public void commit() throws SQLException {
-        log.debug("commit");
         if (connection != null&&configurator.tranceaction()) {
             connection.commit();
+            log.debug("commit");
         }
     }
     /**
@@ -106,7 +106,7 @@ public abstract class ADbManager implements IDbManager {
      */
     @Override
     public void openTransaction() throws SQLException {
-        if (!connection.isClosed()&&configurator.tranceaction()) {
+        if (!connection.isClosed()&&configurator.tranceaction()&&connection.getAutoCommit()) {
             log.debug("open Transaction,setAutoCommit false");
             connection.setAutoCommit(false);
         }

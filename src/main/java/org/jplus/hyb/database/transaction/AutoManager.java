@@ -65,7 +65,7 @@ public class AutoManager extends ADbManager {
      * @throws SQLException
      */
     @Override
-    final public void closeConnection() throws SQLException {
+    public void closeConnection() throws SQLException {
         commit();
         log.trace("use outer manager nothing to do close just commit:{}", defaultConfig);
     }

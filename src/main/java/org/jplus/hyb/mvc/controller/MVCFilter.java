@@ -47,7 +47,7 @@ public class MVCFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         LocalLogger.setLevel(NumberUtils.parseInt(filterConfig.getInitParameter("level")));
         LoggerManager.setLogFactory(filterConfig.getInitParameter("loggerFactory"));
-        ConfigCenter.INSTANCE.setManager("org.jplus.hyb.database.transaction.AutoManager",DbConfig.DEFAULT_CONFIG_NAME);
+        ConfigCenter.INSTANCE.setManager("org.jplus.hyb.database.transaction.TxManager",DbConfig.DEFAULT_CONFIG_NAME);
     }
 
     /**

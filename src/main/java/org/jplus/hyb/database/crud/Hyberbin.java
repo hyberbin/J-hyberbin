@@ -21,6 +21,7 @@ import org.jplus.hyb.database.transaction.IDbManager;
 import org.jplus.hyb.database.util.CacheFactory;
 import org.jplus.hyb.database.util.GetSql;
 import org.jplus.hyb.database.util.Pager;
+import org.jplus.util.ConverString;
 import org.jplus.util.FieldUtil;
 import org.jplus.util.NumberUtils;
 import org.jplus.util.Reflections;
@@ -176,11 +177,12 @@ public class Hyberbin<T> extends BaseDbTool {
             return "";
         }
     }
+
     /**
      * 返回所有的字段信息
-     * @return 
+     * @return
      */
-    public List<FieldColumn> getFieldColumns(){
+    public List<FieldColumn> getFieldColumns() {
         return fields;
     }
 
@@ -234,6 +236,7 @@ public class Hyberbin<T> extends BaseDbTool {
         }
         return list;
     }
+    
 
     /**
      * 将数据库中取到的值存入POJO类.
@@ -246,7 +249,7 @@ public class Hyberbin<T> extends BaseDbTool {
         Class type = fieldColumn.getField().getType();
         Object getResultSet = rs.getObject(fieldColumn.getColumn());
         if (getResultSet != null && !type.isAssignableFrom(getResultSet.getClass())) {
-            getResultSet = rs.getObject(fieldColumn.getColumn(), type);
+            getResultSet = ConverString.asType(type, getResultSet);
         }
         log.trace("loaded Data object:{},field:{},column:{},value:{}", table.getClass().getSimpleName(), fieldColumn.getField().getName(), fieldColumn.getColumn(), getResultSet);
         if (fieldColumn.isHasGetterAndSetter()) {
@@ -580,14 +583,14 @@ public class Hyberbin<T> extends BaseDbTool {
     private List<Map> getMapList(ResultSet rs) throws SQLException {
         List<Map> list = new ArrayList<Map>();
         if (rs != null) {
-            ResultSetMetaData metaData= rs.getMetaData();
+            ResultSetMetaData metaData = rs.getMetaData();
             int columnCount = metaData.getColumnCount();
             fields = new ArrayList<FieldColumn>(columnCount);
-            for(int i=1;i<=columnCount;i++){
+            for (int i = 1; i <= columnCount; i++) {
                 fields.add(new FieldColumn(null, metaData.getColumnName(i), 0, false, true));
             }
             while (rs.next()) {
-                Map<String,Object> map = new MyMap<String,Object>();
+                Map<String, Object> map = new MyMap<String, Object>();
                 for (int i = 1; i <= columnCount; i++) {
                     map.put(metaData.getColumnName(i), rs.getObject(i));
                 }

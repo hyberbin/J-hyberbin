@@ -16,39 +16,43 @@ import org.jplus.util.ObjectHelper;
  * @author Hyberbin
  */
 public class SimpleSqlout implements ISqlout {
-    private static final SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private Boolean needout;
 
     @Override
     public void sqlout(String sql, List parmeters) {
         if (isSqlout()) {
             if (ObjectHelper.isNotEmpty(parmeters)) {
-                for (Object o : parmeters) {
-                    if(o!=null){
-                        if(o instanceof Number){
-                            sql = sql.replaceFirst("[?]", o + "");
-                        }else if(o instanceof Date){
-                            sql = sql.replaceFirst("[?]", "'"+dateFormat.format((Date)o)+"'");
-                        }else{
-                            sql = sql.replaceFirst("[?]", "'"+o + "'");
+                try {
+                    for (Object o : parmeters) {
+                        if (o != null) {
+                            if (o instanceof Number) {
+                                sql = sql.replaceFirst("[?]", o + "");
+                            } else if (o instanceof Date) {
+                                sql = sql.replaceFirst("[?]", "'" + dateFormat.format((Date) o) + "'");
+                            } else {
+                                sql = sql.replaceFirst("[?]", "'" + o + "'");
+                            }
+                        } else {
+                            sql = sql.replaceFirst("[?]", "null");
                         }
-                    }else{
-                        sql = sql.replaceFirst("[?]", "null");
                     }
+                } catch (Exception e) {
                 }
             }
-            System.out.println("sqlout:  "+sql);
+            System.out.println("sqlout:  " + sql);
         }
     }
 
     @Override
     public void setSqlout(boolean needout) {
-        this.needout=needout;
+        this.needout = needout;
     }
 
     @Override
     public boolean isSqlout() {
-        return needout==null?needout=ConfigCenter.INSTANCE.getConfigurator().sqlOut():needout;
+        return needout == null ? needout = ConfigCenter.INSTANCE.getConfigurator().sqlOut() : needout;
     }
 
 }
