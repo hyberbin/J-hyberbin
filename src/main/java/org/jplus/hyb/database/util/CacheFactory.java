@@ -1,7 +1,18 @@
 /*
- * 要使用缓存工厂，POJO类必需加上@CacheEntity注解
- * 每个缓存池大小由注解中的max大小决定，大小默认为100
- * 当每个缓存池超出指定大小时会自动按照数据的使用次数删除使用次数小的一半数据
+ * Copyright 2014 Hyberbin.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * Email:hyberbin@qq.com
  */
 package org.jplus.hyb.database.util;
 
