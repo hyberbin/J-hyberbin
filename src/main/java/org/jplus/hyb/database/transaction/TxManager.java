@@ -19,7 +19,10 @@ package org.jplus.hyb.database.transaction;
 import java.sql.SQLException;
 
 /**
- *
+ * 自动的数据库连接管理器. <br/>
+ * 只对指定数据库连接进行管理. <br/>
+ * 每次用完连接后不提交事务也不关闭连接，同一个线程中对一个数据库只开启一个连接.
+ * 仅仅在调用finalCloseConnection方法后提交事务关闭连接.
  * @author Hyberbin
  */
 public class TxManager extends AutoManager{
@@ -29,7 +32,7 @@ public class TxManager extends AutoManager{
     }
     
     /**
-     * 关闭数据库连接. 在本管理器中没有真正关闭数据库而只是提交事务.
+     * 关闭数据库连接. 在本管理器中没有做任何操作.
      * @throws SQLException
      */
     @Override
@@ -38,7 +41,7 @@ public class TxManager extends AutoManager{
     }
 
     /**
-     * 最终关闭数据库连接. 用户程序运行到最后或者线程结束的时候释放数据库连接资源.
+     * 最终关闭数据库连接. 用户程序运行到最后或者线程结束的时候提交事务并释放数据库连接资源.
      * @throws SQLException
      */
     @Override

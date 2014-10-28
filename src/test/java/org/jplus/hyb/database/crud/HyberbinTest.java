@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.config.DbConfig;
-import org.jplus.hyb.database.transaction.AutoManager;
+import org.jplus.hyb.database.config.SimpleConfigurator;
 import org.jplus.hyb.database.transaction.IDbManager;
 import org.jplus.hyb.database.util.Pager;
 import org.jplus.hyb.log.LocalLogger;
@@ -66,11 +66,25 @@ public class HyberbinTest {
 
     @BeforeClass
     public static void setUpClass() {
-        System.out.println(System.getProperty("classpath"));
+        SimpleConfigurator.addConfigurator(new DbConfig(DbConfig.DRIVER_SQLITE, "jdbc:sqlite:data.db", "", "", DbConfig.DEFAULT_CONFIG_NAME));
+        DatabaseAccess lite = new DatabaseAccess(ConfigCenter.INSTANCE.getManager());
+        try {
+            Object count = lite.queryUnique("SELECT COUNT(*) FROM sqlite_master where type='table' and name='servers'");
+            if (!Integer.valueOf(1).equals(count)) {
+                String sql = "CREATE TABLE `servers` (\n"
+                        + "  `Id` integer PRIMARY KEY autoincrement,\n"
+                        + "  `name` varchar(255) DEFAULT NULL ,\n"
+                        + "  `adds` varchar(255) DEFAULT NULL,\n"
+                        + "  `note` varchar(255) DEFAULT NULL,\n"
+                        + "  `type` int(11) DEFAULT NULL\n"
+                        + ") ";
+                new DatabaseAccess(ConfigCenter.INSTANCE.getManager()).update(sql);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         LocalLogger.setLevel(LocalLogger.TRACE);
         LoggerManager.setLogFactory(LoggerFactory.class);
-        ConfigCenter.INSTANCE.setManager(new AutoManager(DbConfig.DEFAULT_CONFIG_NAME));
-        //ConfigCenter.INSTANCE.setConfigurator(new SimpleConfigurator("com.microsoft.sqlserver.jdbc.SQLServerDriver", "jdbc:sqlserver://localhost;DatabaseName=test;", "hyb", "hyb"));
         DatabaseAccess access = new DatabaseAccess(ConfigCenter.INSTANCE.getManager());
         try {
             int update = access.update("delete from servers");

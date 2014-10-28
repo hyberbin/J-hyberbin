@@ -23,7 +23,12 @@ package org.jplus.hyb.database.config;
 public class DbConfig {
 
     public static final String DEFAULT_CONFIG_NAME = "default";
-    private static final String DRIVER = "com.mysql.jdbc.Driver";
+    public static final String DRIVER_SQLITE = "org.sqlite.JDBC";
+    public static final String DRIVER_MYSQL = "com.mysql.jdbc.Driver";
+    public static final String DRIVER_ORACLE = "oracle.jdbc.driver.OracleDriver";
+    public static final String DRIVER_SQLSERVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    private static final String DRIVER = DRIVER_MYSQL;
+    
     private static final String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
     private static final String USER = "root";
     private static final String PASS = "root";

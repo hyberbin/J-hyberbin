@@ -467,13 +467,6 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public T showOne(String sql) throws SQLException {
         log.trace("in showOne");
-        showOneWithoutTx(sql);
-        tx.closeConnection();
-        return getPo();
-    }
-
-    private T showOneWithoutTx(String sql) throws SQLException {
-        log.trace("in showOneWithoutTx");
         ResultSet rs = adapter.findSingle(getConnection(), sql);//执行查询
         try {
             if (rs != null && rs.next()) {
@@ -488,6 +481,7 @@ public class Hyberbin<T> extends BaseDbTool {
                 throw new IllegalArgumentException("loadData error!", ex);
             }
         }
+        tx.closeConnection();
         return getPo();
     }
 
@@ -504,9 +498,7 @@ public class Hyberbin<T> extends BaseDbTool {
         FieldColumn fieldColumn = FieldUtil.getFieldColumnByCache(FieldUtil.getField(getPo().getClass(), key));
         adapter.addParameter(value);
         String sql = "select " + getFieldList() + " from " + getQuotedItem(tableName) + " where " + fieldColumn.getColumn() + "=?";
-        showOneWithoutTx(sql);
-        tx.closeConnection();
-        return getPo();
+        return showOne(sql);
     }
 
     /**
@@ -517,9 +509,7 @@ public class Hyberbin<T> extends BaseDbTool {
     public List<T> showAll() throws SQLException {
         log.trace("in showAll");
         String sql = "select " + getFieldList() + " from " + tableName;
-        List showListWithoutTx = showListWithoutTx(sql);
-        tx.closeConnection();
-        return showListWithoutTx;
+        return showList(sql);
     }
 
     /**
@@ -531,9 +521,7 @@ public class Hyberbin<T> extends BaseDbTool {
     public List<T> showAll(String where) throws SQLException {
         log.trace("in showAll (String where) ");
         String sql = "select " + getFieldList() + " from " + tableName + " " + where;
-        List showListWithoutTx = showListWithoutTx(sql);
-        tx.closeConnection();
-        return showListWithoutTx;
+        return showList(sql);
     }
 
     /**
@@ -563,6 +551,7 @@ public class Hyberbin<T> extends BaseDbTool {
         String sql = "select " + getFieldList() + "  from " + getQuotedItem(tableName) + " " + where;
         ResultSet rs = adapter.findPageList(getConnection(), sql, pager);
         List list = loadListData(getPo(), rs);
+        tx.closeConnection();
         sql = "select count(*) from (" + sql + ") as count";
         Object findUnique = adapter.findUnique(getConnection(), sql);
         pager.setItems(NumberUtils.parseInt(findUnique));
@@ -579,15 +568,10 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public List<T> showList(String sql) throws SQLException {
         log.trace("in showList");
-        List showListWithoutTx = showListWithoutTx(sql);
-        tx.closeConnection();
-        return showListWithoutTx;
-    }
-
-    private List<T> showListWithoutTx(String sql) throws SQLException {
-        log.trace("in showListWithoutTx");
         ResultSet rs = adapter.findList(getConnection(), sql);//执行查询
-        return loadListData(getPo(), rs);
+        List list = loadListData(getPo(), rs);
+        tx.closeConnection();
+        return list;
     }
 
     /**
@@ -637,6 +621,7 @@ public class Hyberbin<T> extends BaseDbTool {
     public void getMapList(String sql, Pager pager) throws SQLException {
         ResultSet findPageList = adapter.findPageList(getConnection(), sql, pager);
         pager.setData(getMapList(findPageList));
+        tx.closeConnection();
         sql = "select count(*) from (" + sql + ") as count";
         Object findUnique = adapter.findUnique(getConnection(), sql);
         pager.setItems(NumberUtils.parseInt(findUnique));

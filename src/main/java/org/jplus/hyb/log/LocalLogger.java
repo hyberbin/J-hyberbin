@@ -59,35 +59,35 @@ public class LocalLogger implements Logger {
     @Override
     public void trace(String msg) {
         if (isTraceEnabled()) {
-            System.out.println(TextFormat.format(msg));
+            println(TextFormat.format(msg));
         }
     }
 
     @Override
     public void trace(String format, Object arg) {
         if (isTraceEnabled()) {
-            System.out.println(TextFormat.format(format, arg));
+            println(TextFormat.format(format, arg));
         }
     }
 
     @Override
     public void trace(String format, Object arg1, Object arg2) {
         if (isTraceEnabled()) {
-            System.out.println(TextFormat.format(format, arg1, arg2));
+            println(TextFormat.format(format, arg1, arg2));
         }
     }
 
     @Override
     public void trace(String format, Object... arguments) {
         if (isTraceEnabled()) {
-            System.out.println(TextFormat.format(format, arguments));
+            println(TextFormat.format(format, arguments));
         }
     }
 
     @Override
     public void trace(String msg, Throwable t) {
         if (isTraceEnabled()) {
-            System.out.println(TextFormat.format(msg, t));
+            println(TextFormat.format(msg, t));
         }
     }
 
@@ -99,35 +99,35 @@ public class LocalLogger implements Logger {
     @Override
     public void debug(String msg) {
         if (isDebugEnabled()) {
-           System.out.println(TextFormat.format(msg));
+           println(TextFormat.format(msg));
         }
     }
 
     @Override
     public void debug(String format, Object arg) {
         if (isDebugEnabled()) {
-            System.out.println(TextFormat.format(format, arg));
+            println(TextFormat.format(format, arg));
         }
     }
 
     @Override
     public void debug(String format, Object arg1, Object arg2) {
         if (isDebugEnabled()) {
-            System.out.println(TextFormat.format(format, arg1, arg2));
+            println(TextFormat.format(format, arg1, arg2));
         }
     }
 
     @Override
     public void debug(String format, Object... arguments) {
         if (isDebugEnabled()) {
-            System.out.println(TextFormat.format(format, arguments));
+            println(TextFormat.format(format, arguments));
         }
     }
 
     @Override
     public void debug(String msg, Throwable t) {
         if (isDebugEnabled()) {
-            System.out.println(TextFormat.format(msg, t));
+            println(TextFormat.format(msg, t));
         }
     }
 
@@ -139,35 +139,35 @@ public class LocalLogger implements Logger {
     @Override
     public void info(String msg) {
         if (isInfoEnabled()) {
-            System.out.println(TextFormat.format(msg));
+            println(TextFormat.format(msg));
         }
     }
 
     @Override
     public void info(String format, Object arg) {
         if (isInfoEnabled()) {
-            System.out.println(TextFormat.format(format, arg));
+            println(TextFormat.format(format, arg));
         }
     }
 
     @Override
     public void info(String format, Object arg1, Object arg2) {
         if (isInfoEnabled()) {
-            System.out.println(TextFormat.format(format, arg1, arg2));
+            println(TextFormat.format(format, arg1, arg2));
         }
     }
 
     @Override
     public void info(String format, Object... arguments) {
         if (isInfoEnabled()) {
-            System.out.println(TextFormat.format(format, arguments));
+            println(TextFormat.format(format, arguments));
         }
     }
 
     @Override
     public void info(String msg, Throwable t) {
         if (isInfoEnabled()) {
-            System.out.println(TextFormat.format(msg, t));
+            println(TextFormat.format(msg, t));
         }
     }
 
@@ -179,35 +179,35 @@ public class LocalLogger implements Logger {
     @Override
     public void warn(String msg) {
         if (isWarnEnabled()) {
-            System.out.println(TextFormat.format(msg));
+            println(TextFormat.format(msg));
         }
     }
 
     @Override
     public void warn(String format, Object arg) {
         if (isWarnEnabled()) {
-            System.out.println(TextFormat.format(format, arg));
+            println(TextFormat.format(format, arg));
         }
     }
 
     @Override
     public void warn(String format, Object... arguments) {
         if (isWarnEnabled()) {
-            System.out.println(TextFormat.format(format, arguments));
+            println(TextFormat.format(format, arguments));
         }
     }
 
     @Override
     public void warn(String format, Object arg1, Object arg2) {
         if (isWarnEnabled()) {
-            System.out.println(TextFormat.format(format, arg1, arg2));
+            println(TextFormat.format(format, arg1, arg2));
         }
     }
 
     @Override
     public void warn(String msg, Throwable t) {
         if (isWarnEnabled()) {
-            System.out.println(TextFormat.format(msg, t));
+            println(TextFormat.format(msg, t));
         }
     }
 
@@ -219,36 +219,40 @@ public class LocalLogger implements Logger {
     @Override
     public void error(String msg) {
         if (isErrorEnabled()) {
-             System.out.println(TextFormat.format(msg));
+             println(TextFormat.format(msg));
         }
     }
 
     @Override
     public void error(String format, Object arg) {
         if (isErrorEnabled()) {
-            System.out.println(TextFormat.format(format, arg));
+            println(TextFormat.format(format, arg));
         }
     }
 
     @Override
     public void error(String format, Object arg1, Object arg2) {
         if (isErrorEnabled()) {
-            System.out.println(TextFormat.format(format, arg1, arg2));
+            println(TextFormat.format(format, arg1, arg2));
         }
     }
 
     @Override
     public void error(String format, Object... arguments) {
         if (isErrorEnabled()) {
-            System.out.println(TextFormat.format(format, arguments));
+            println(TextFormat.format(format, arguments));
         }
     }
 
     @Override
     public void error(String msg, Throwable t) {
         if (isErrorEnabled()) {
-            System.out.println(TextFormat.format(msg, t));
+            println(TextFormat.format(msg, t));
         }
+    }
+    
+    public void println(String msg){
+        System.out.println(msg);
     }
 
 }

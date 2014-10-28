@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * 自动的数据库连接管理器. <br/>
  * 只对指定数据库连接进行管理. <br/>
- * 每次用完连接不关闭，同一个线程中对一个数据库只开启一个连接.
+ * 每次用完连接后只提交事务但不关闭连接，同一个线程中对一个数据库只开启一个连接.
  * @author Hyberbin
  */
 public class AutoManager extends ADbManager {
