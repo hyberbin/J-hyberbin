@@ -290,6 +290,7 @@ public class Hyberbin<T> extends BaseDbTool {
     private GetSql getSql() {
         GetSql gs = new GetSql();
         for (FieldColumn field : fields) {
+            if(field.isIgnore())continue;
             Object value = field.getField().isAnnotationPresent(JoinColumn.class)
                     ? FieldUtil.getFatherFieldValue(getPo(), field.getField().getName())
                     : FieldUtil.getFieldValue(getPo(), field.getField().getName());

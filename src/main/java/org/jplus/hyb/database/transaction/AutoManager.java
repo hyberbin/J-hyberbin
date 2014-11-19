@@ -67,7 +67,7 @@ public class AutoManager extends ADbManager {
      * @param connection 连接
      * @return
      */
-    private boolean validConnection(Connection connection) {
+    protected boolean validConnection(Connection connection) {
         try {
             return connection != null && connection.isValid(3);
         } catch (SQLException ex) {
