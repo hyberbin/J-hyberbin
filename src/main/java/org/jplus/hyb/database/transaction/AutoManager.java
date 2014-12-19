@@ -92,6 +92,7 @@ public class AutoManager extends ADbManager {
      */
     @Override
     public void finalCloseConnection() throws SQLException {
+        getConnection();
         Map<String, Connection> map = threadLocal.get();
         log.trace("config map isnull:{}", map == null);
         if (map != null) {
@@ -103,13 +104,5 @@ public class AutoManager extends ADbManager {
         }
         log.trace("in finalCloseConnection:{}", defaultConfig);
     }
-
-    /**
-     * 复制一个实例.
-     * @return
-     */
-    @Override
-    public IDbManager newInstance() {
-        return new AutoManager(defaultConfig);
-    }
+   
 }

@@ -16,6 +16,7 @@
  */
 package org.jplus.hyb.database.crud;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +26,7 @@ import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.config.DbConfig;
 import org.jplus.hyb.database.config.SimpleConfigurator;
-import org.jplus.hyb.database.transaction.IDbManager;
+import org.jplus.hyb.database.transaction.TxManager;
 import org.jplus.hyb.database.util.Pager;
 import org.jplus.hyb.log.LocalLogger;
 import org.jplus.hyb.log.LoggerManager;
@@ -51,6 +52,24 @@ import org.slf4j.LoggerFactory;
  */
 public class HyberbinTest {
 
+    private static Connection CONNECTION;
+
+    static {
+        LocalLogger.setLevel(LocalLogger.DEBUG);
+        LoggerManager.setLogFactory(LoggerFactory.class);
+        SimpleConfigurator.addConfigurator(new DbConfig(DbConfig.DRIVER_SQLITE, "jdbc:sqlite:data.db", "", "", DbConfig.DEFAULT_CONFIG_NAME));
+        ConfigCenter.INSTANCE.setManager(new TxManager(DbConfig.DEFAULT_CONFIG_NAME) {
+            @Override
+            public Connection getConnection() {
+                if (CONNECTION == null) {
+                    CONNECTION = super.getConnection();
+                }
+                connection = CONNECTION;
+                return CONNECTION;
+            }
+        });
+    }
+
     public HyberbinTest() {
     }
 
@@ -66,7 +85,6 @@ public class HyberbinTest {
 
     @BeforeClass
     public static void setUpClass() {
-        SimpleConfigurator.addConfigurator(new DbConfig(DbConfig.DRIVER_SQLITE, "jdbc:sqlite:data.db", "", "", DbConfig.DEFAULT_CONFIG_NAME));
         DatabaseAccess lite = new DatabaseAccess(ConfigCenter.INSTANCE.getManager());
         try {
             Object count = lite.queryUnique("SELECT COUNT(*) FROM sqlite_master where type='table' and name='servers'");
@@ -83,8 +101,7 @@ public class HyberbinTest {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        LocalLogger.setLevel(LocalLogger.TRACE);
-        LoggerManager.setLogFactory(LoggerFactory.class);
+
         DatabaseAccess access = new DatabaseAccess(ConfigCenter.INSTANCE.getManager());
         try {
             int update = access.update("delete from servers");
@@ -96,12 +113,6 @@ public class HyberbinTest {
 
     @AfterClass
     public static void tearDownClass() {
-        IDbManager manager = ConfigCenter.INSTANCE.getManager();
-        try {
-            manager.finalCloseConnection();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
     }
 
     @Before

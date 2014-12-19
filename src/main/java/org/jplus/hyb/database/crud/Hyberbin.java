@@ -352,12 +352,13 @@ public class Hyberbin<T> extends BaseDbTool {
      * hyberbin.addParameter("1");</strong>
      * hyberbin.showOne("select * from news where content like ? and
      * newstype=?");
-     * @param parmeter 参数
+     * @param parmeters 参数
      * @return 自身对象
      */
-    public Hyberbin addParmeter(Object parmeter) {
-        log.trace("in addParmeter");
-        adapter.addParameter(parmeter);
+    public Hyberbin addParmeter(Object... parmeters) {
+        for (Object parmeter : parmeters) {
+            adapter.addParameter(parmeter);
+        }
         return this;
     }
 
@@ -463,11 +464,13 @@ public class Hyberbin<T> extends BaseDbTool {
      * 建议用户自己使用预处理技术（addParameter("……")）以提高安全性. Ex: Hyberbin hyberbin=new
      * hyberbin.showOne("select * from news where id=?"); //查询id为2的新闻
      * @param sql 指定SQL语句
+     * @param parmeters
      * @return 查询对象
      * @throws java.sql.SQLException
      */
-    public T showOne(String sql) throws SQLException {
+    public T showOne(String sql,Object... parmeters) throws SQLException {
         log.trace("in showOne");
+        addParmeter(parmeters);
         ResultSet rs = adapter.findSingle(getConnection(), sql);//执行查询
         try {
             if (rs != null && rs.next()) {
@@ -564,10 +567,12 @@ public class Hyberbin<T> extends BaseDbTool {
      * 数据库的批量查询. 此方法用于对数据库单表的查询操作，用于用户自己提供sql语句. 由于是自己构造sql语句所以适用于所有数据库.
      * hyberbin.showList("select * from news where newstype=?");
      * @param sql 完整的sql语句
+     * @param parmeters
      * @return 查询结果集合
      * @throws java.sql.SQLException
      */
-    public List<T> showList(String sql) throws SQLException {
+    public List<T> showList(String sql,Object... parmeters) throws SQLException {
+        addParmeter(parmeters);
         log.trace("in showList");
         ResultSet rs = adapter.findList(getConnection(), sql);//执行查询
         List list = loadListData(getPo(), rs);
@@ -604,10 +609,12 @@ public class Hyberbin<T> extends BaseDbTool {
     /**
      * 将查询的结果存放到List中list的每个节点都是Map.
      * @param sql 完整的SQL语句.
+     * @param parmeters
      * @return
      * @throws SQLException
      */
-    public List<Map> getMapList(String sql) throws SQLException {
+    public List<Map> getMapList(String sql,Object... parmeters) throws SQLException {
+        addParmeter(parmeters);
         List<Map> mapList = getMapList(adapter.findList(getConnection(), sql));
         tx.closeConnection();
         return mapList;
@@ -617,9 +624,11 @@ public class Hyberbin<T> extends BaseDbTool {
      * 根据SQL语句查出一个map集合. 数据对象直接放在pager中.
      * @param sql SQL语句
      * @param pager 分页对象
+     * @param parmeters
      * @throws java.sql.SQLException
      */
-    public void getMapList(String sql, Pager pager) throws SQLException {
+    public void getMapList(String sql, Pager pager,Object... parmeters) throws SQLException {
+        addParmeter(parmeters);
         ResultSet findPageList = adapter.findPageList(getConnection(), sql, pager);
         pager.setData(getMapList(findPageList));
         tx.closeConnection();

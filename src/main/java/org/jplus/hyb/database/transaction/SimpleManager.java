@@ -38,13 +38,5 @@ public class SimpleManager extends ADbManager {
         log.debug("close Connection");
         connection.close();
     }
-    /**
-     * 复制一个实例.
-     * @return 
-     */
-    @Override
-    public IDbManager newInstance() {
-        return new SimpleManager(defaultConfig);
-    }
 
 }

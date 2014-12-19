@@ -321,6 +321,7 @@ public class Reflections {
         try {
             Class dialectCls = Class.forName(className);
             Constructor constructor = dialectCls.getDeclaredConstructor(types);
+            constructor.setAccessible(true);
             return constructor.newInstance(objects);
         } catch (ClassNotFoundException e) {
             log.error("[无法找到方言类]", e);

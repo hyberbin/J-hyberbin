@@ -25,6 +25,7 @@ import org.jplus.hyb.database.config.SimpleConfigurator;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
 import org.jplus.util.NullUtils;
+import org.jplus.util.Reflections;
 
 /**
  * 数据库连接管理器.
@@ -142,5 +143,12 @@ public abstract class ADbManager implements IDbManager {
     public void finalCloseConnection() throws SQLException {
         log.debug("finalCloseConnection do nothing!");
     }
-
+/**
+     * 复制一个实例.
+     * @return
+     */
+    @Override
+    public IDbManager newInstance() {
+        return (IDbManager)Reflections.instance(this.getClass().getName(), new Class[]{String.class}, new Object[]{defaultConfig});
+    }
 }

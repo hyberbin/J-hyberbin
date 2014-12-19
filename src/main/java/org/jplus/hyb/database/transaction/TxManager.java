@@ -17,6 +17,7 @@
 package org.jplus.hyb.database.transaction;
 
 import java.sql.SQLException;
+import org.jplus.util.Reflections;
 
 /**
  * 自动的数据库连接管理器. <br/>
@@ -51,12 +52,4 @@ public class TxManager extends AutoManager{
         super.finalCloseConnection();
     }
     
-    /**
-     * 复制一个实例.
-     * @return
-     */
-    @Override
-    public IDbManager newInstance() {
-        return new TxManager(defaultConfig);
-    }
 }
