@@ -19,6 +19,7 @@ package org.jplus.hyb.mvc.classloader;
 import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.Service;
 import org.jplus.annotation.Action;
 
 /**
@@ -84,7 +85,7 @@ public class ClassFilter implements IClassFilter {
      */
     @Override
     public boolean filterClass(Class clazz) {
-        return !clazz.isInterface() && !clazz.isAnnotation() && clazz.isAnnotationPresent(Action.class);
+        return !clazz.isInterface() && !clazz.isAnnotation() && clazz.isAnnotationPresent(Action.class)||clazz.isAnnotationPresent(Service.class);
     }
     /**
      * 加入不加载类的正则表达式

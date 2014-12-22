@@ -35,6 +35,7 @@ import org.jplus.annotation.Mapping;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
 import org.jplus.hyb.mvc.bean.MVCBean;
+import org.jplus.hyb.mvc.contex.ObjectContex;
 import org.jplus.hyb.mvc.mapping.IMappingManager;
 import org.jplus.hyb.mvc.mapping.MappingManager;
 import org.jplus.util.FileCopyUtils;
@@ -60,13 +61,15 @@ public final class ClassScanner extends ClassLoader implements IClassLoader {
     public static ClassScanner MY_INSTANCE = new ClassScanner();
     private IClassFilter classFilter = ClassFilter.INSTANCE;
     private IMappingManager mappingManager=new MappingManager();
+   
 
     /**
      * 私有构造方法不允许外部创建.
      */
     private ClassScanner() {
         loadClassPath();
-        loadJar();
+        //loadJar();
+        ObjectContex.CONTEX.setServiceMap(classList);
         setActionMap();
     }
 
@@ -127,6 +130,7 @@ public final class ClassScanner extends ClassLoader implements IClassLoader {
             try {
                 if (clazz.isAnnotationPresent(Action.class)) {
                     Object mvcObject = clazz.newInstance();
+                    ObjectContex.CONTEX.setResource(mvcObject);
                     Action annotation = (Action) clazz.getAnnotation(Action.class);
                     String[] urlPatterns = annotation.urlPatterns();
                     for (String url : urlPatterns) {
@@ -175,6 +179,9 @@ public final class ClassScanner extends ClassLoader implements IClassLoader {
         log.info("---------------加载了{}个Class，{}个Url----------------", classList.size(), count);
         return count;
     }
+    
+    
+    
 
     /**
      * 通过Url获得MVC主体模型实例.
