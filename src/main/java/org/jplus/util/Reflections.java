@@ -16,17 +16,14 @@
  */
 package org.jplus.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 import org.jplus.hyb.database.util.CacheFactory;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
+
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * FileUtil说明.
@@ -94,7 +91,7 @@ public class Reflections {
         try {
             result = field.get(obj);
         } catch (IllegalAccessException e) {
-            log.error("{}[不可访问的对象]", obj.getClass().getName(),e);
+            log.error("{}[不可访问的对象]", obj.getClass().getName(), e);
         }
         return result;
     }
@@ -113,7 +110,7 @@ public class Reflections {
         try {
             field.set(obj, value);
         } catch (IllegalAccessException ex) {
-            log.error("{}[不可访问的对象]", obj.getClass().getName(),ex);
+            log.error("{}[不可访问的对象]", obj.getClass().getName(), ex);
         }
     }
 
@@ -206,14 +203,14 @@ public class Reflections {
         }
         return null;
     }
-    
+
     /**
      * 获取一个对象中的所有字段，包括父类中的字段信息
      * @param obj
      * @return
      */
     public static List<Field> getAllFields(Object obj) {
-        return getAllFields(obj,Object.class);
+        return getAllFields(obj, Object.class);
     }
 
     /**
@@ -222,9 +219,9 @@ public class Reflections {
      * @param theEnd
      * @return
      */
-    public static List<Field> getAllFields(Object obj,Class theEnd) {
+    public static List<Field> getAllFields(Object obj, Class theEnd) {
         List<Field> fields = new ArrayList<Field>();
-        for (Class<?> superClass =obj instanceof Class?(Class)obj: obj.getClass(); superClass != theEnd; superClass = superClass.getSuperclass()) {
+        for (Class<?> superClass = obj instanceof Class ? (Class) obj : obj.getClass(); superClass != theEnd; superClass = superClass.getSuperclass()) {
             Field[] field = superClass.getDeclaredFields();
             for (Field f : field) {
                 f.setAccessible(true);
@@ -233,11 +230,11 @@ public class Reflections {
         }
         return fields;
     }
-    
+
     public static List<Method> getAllMethods(final Object obj) {
-        log.trace("getAllMethods from class:{}",obj);
+        log.trace("getAllMethods from class:{}", obj);
         List<Method> methods = new ArrayList<Method>();
-        for (Class<?> superClass = obj instanceof Class ? (Class) obj : obj.getClass(); superClass != Object.class; superClass = superClass.getSuperclass()) {
+        for (Class<?> superClass = obj instanceof Class ? (Class) obj : obj.getClass(); superClass != Object.class&&superClass!=null; superClass = superClass.getSuperclass()) {
             Method[] method = superClass.getDeclaredMethods();
             for (Method method1 : method) {
                 method1.setAccessible(true);
@@ -253,7 +250,7 @@ public class Reflections {
      *
      * @param clazz The class to introspect
      * @return the first generic declaration, or Object.class if cannot be
-     * determined
+     *         determined
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T> Class<T> getSuperClassGenricType(final Class clazz) {
@@ -268,7 +265,7 @@ public class Reflections {
      * @param clazz clazz The class to introspect
      * @param index the Index of the generic ddeclaration,start from 0.
      * @return the index generic declaration, or Object.class if cannot be
-     * determined
+     *         determined
      */
     @SuppressWarnings("rawtypes")
     public static Class getSuperClassGenricType(final Class clazz, final int index) {
@@ -299,7 +296,7 @@ public class Reflections {
      */
     @SuppressWarnings("rawtypes")
     public static Object instance(String className) {
-        log.trace("instance for {}",className);
+        log.trace("instance for {}", className);
         try {
             Class dialectCls = Class.forName(className);
             return dialectCls.newInstance();
@@ -317,7 +314,7 @@ public class Reflections {
 
     @SuppressWarnings("rawtypes")
     public static Object instance(String className, Class[] types, Object[] objects) {
-        log.trace("instance for {},types {},objects {}",className,types,objects);
+        log.trace("instance for {},types {},objects {}", className, types, objects);
         try {
             Class dialectCls = Class.forName(className);
             Constructor constructor = dialectCls.getDeclaredConstructor(types);
@@ -352,6 +349,12 @@ public class Reflections {
             return (RuntimeException) e;
         }
         return new RuntimeException("Unexpected Checked Exception.", e);
+    }
+
+    public static boolean isSimpleType(Class clazz) {
+        return Number.class.isAssignableFrom(clazz) || clazz.equals(String.class)
+                || Date.class.isAssignableFrom(clazz)
+                || boolean.class.isAssignableFrom(clazz)|| Boolean.class.isAssignableFrom(clazz);
     }
 
     /**

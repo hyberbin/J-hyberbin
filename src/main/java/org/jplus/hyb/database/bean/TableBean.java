@@ -16,10 +16,11 @@
  */
 package org.jplus.hyb.database.bean;
 
+import org.jplus.util.ObjectHelper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.jplus.util.ObjectHelper;
 
 /**
  *
@@ -30,6 +31,7 @@ public class TableBean {
     private String tableName;
     private List<FieldColumn> columns;
     private Map<String, FieldColumn> columnMap;
+    private String primaryKey="id";
 
     public String getTableName() {
         return tableName;
@@ -41,6 +43,14 @@ public class TableBean {
 
     public List<FieldColumn> getColumns() {
         return columns;
+    }
+
+    public String getPrimaryKey() {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey(String primaryKey) {
+        this.primaryKey = primaryKey;
     }
 
     public void setColumns(List<FieldColumn> columns) {

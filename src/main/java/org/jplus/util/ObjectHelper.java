@@ -31,16 +31,16 @@ import java.util.Map;
  */
 public class ObjectHelper {
 
-
+/**
+     * 对象是否为空或者toString为空
+     * @param o
+     * @return
+     */
 	public static boolean isNullOrEmptyString(Object o) {
-		if(o == null)
-			return true;
-		if(String.class.isAssignableFrom(o.getClass())) {
-			String str = (String)o;
-			if(str.trim().length() == 0)
-				return true;
-		}
-		return false;
+		if(o == null){
+            return true;
+        }
+		return o.toString().length()==0;
 	}
 
 	/**
@@ -51,12 +51,11 @@ public class ObjectHelper {
 	@SuppressWarnings("all")
 	public static boolean isEmpty(Object o)  {
 		if(o == null) return true;
-
-		if(String.class.isAssignableFrom(o.getClass())) {
+		if(o instanceof String) {
 			if(((String)o).length() == 0){
 				return true;
 			}
-		} else if(Collection.class.isAssignableFrom(o.getClass())) {
+		} else if(o instanceof Collection) {
 			if(((Collection)o).isEmpty()){
 				return true;
 			}
@@ -64,7 +63,7 @@ public class ObjectHelper {
 			if(Array.getLength(o) == 0){
 				return true;
 			}
-		} else if(Map.class.isAssignableFrom(o.getClass())) {
+		} else if(o instanceof Map) {
 			if(((Map)o).isEmpty()){
 				return true;
 			}
@@ -83,4 +82,60 @@ public class ObjectHelper {
 	public static boolean isNotEmpty(Object c) throws IllegalArgumentException{
 		return !isEmpty(c);
 	}
+
+    /**
+     * 是否所有对象全部为null
+     * @param objects
+     * @return
+     */
+    public static boolean isAllNull(Object... objects) {
+            for (Object object : objects) {
+                if (object != null) {
+                    return false;
+                }
+            }
+        return true;
+    }
+
+    /**
+     * 是否所有对象全部不为null
+     * @param objects
+     * @return
+     */
+    public static boolean isAllNotNull(Object... objects) {
+            for (Object object : objects) {
+                if (object == null) {
+                    return false;
+                }
+            }
+        return true;
+    }
+
+    /**
+     * 是否所有对象全部为null或者说toString==“”
+     * @param objects
+     * @return
+     */
+    public static boolean isAllEmpty(Object... objects) {
+        for (int i = 0; i < objects.length; i++) {
+            if (!isNullOrEmptyString(objects[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 是否所有对象全部不为null并且toString不为空
+     * @param objects
+     * @return
+     */
+    public static boolean isAllNotEmpty(Object... objects) {
+        for (int i = 0; i < objects.length; i++) {
+            if (isNullOrEmptyString(objects[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -16,6 +16,7 @@
  */
 package org.jplus.hyb.database.bean;
 
+import javax.persistence.Id;
 import java.lang.reflect.Field;
 
 /**
@@ -84,6 +85,7 @@ public class FieldColumn {
     public void setIgnore(boolean ignore) {
         this.ignore = ignore;
     }
+
 
     @Override
     public boolean equals(Object obj) {

@@ -16,19 +16,21 @@
  */
 package org.jplus.hyb.database.util;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.persistence.Table;
 import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.bean.TableBean;
 import org.jplus.hyb.log.LocalLogger;
 import org.jplus.hyb.log.Logger;
 import org.jplus.util.FieldUtil;
 import org.jplus.util.ObjectHelper;
+
+import javax.persistence.Id;
+import javax.persistence.Table;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 缓存工厂
@@ -86,6 +88,9 @@ public class CacheFactory {
             List<FieldColumn> columns = new ArrayList<FieldColumn>(0);
             for (Field field : declaredFields) {
                 columns.add(FieldUtil.getFieldColumn(field));
+                if(field.isAnnotationPresent(Id.class)){
+                    tableBean.setPrimaryKey(field.getName());
+                }
             }
             tableBean.setColumns(columns);
             putHyberbin(po, tableBean);

@@ -16,20 +16,6 @@
  */
 package org.jplus.hyb.database.crud;
 
-import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.bean.TableBean;
 import org.jplus.hyb.database.config.ConfigCenter;
@@ -41,6 +27,21 @@ import org.jplus.util.ConverString;
 import org.jplus.util.FieldUtil;
 import org.jplus.util.NumberUtils;
 import org.jplus.util.Reflections;
+
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 数据库持久层框架核心类之一 此类用于给定POJO类的数据库操作.
@@ -63,9 +64,11 @@ public class Hyberbin<T> extends BaseDbTool {
     /** 为空的字段列表 */
     private List<FieldColumn> nuList;
 
+    private String primaryKey="id";
+
     /**
      * 根据表的实体类初始化.
-     * @param tablebean 表的实体类
+     * @param po 表的实体类
      */
     private void ini(T po) {
         if (po != null) {
@@ -73,6 +76,7 @@ public class Hyberbin<T> extends BaseDbTool {
                 TableBean tableBean = CacheFactory.MINSTANCE.getHyberbin(po.getClass());
                 this.po = po;
                 this.tableName = tableBean.getTableName();
+                this.primaryKey=tableBean.getPrimaryKey();
                 fields = new ArrayList<FieldColumn>(tableBean.getColumns());
             } catch (SecurityException ex) {
                 log.error("初始化错误", ex);
@@ -660,6 +664,9 @@ public class Hyberbin<T> extends BaseDbTool {
         nuList.add(FieldUtil.getFieldColumnByCache(FieldUtil.getField(getPo().getClass(), field)));
     }
 
+    public String getPrimaryKey() {
+        return primaryKey;
+    }
 }
 
 class MyMap<K, V> extends HashMap<K, V> {

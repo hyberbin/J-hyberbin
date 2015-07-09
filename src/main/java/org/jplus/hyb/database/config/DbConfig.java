@@ -28,11 +28,10 @@ public class DbConfig {
     public static final String DRIVER_ORACLE = "oracle.jdbc.driver.OracleDriver";
     public static final String DRIVER_SQLSERVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final String DRIVER = DRIVER_MYSQL;
-    
+
     private static final String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
     private static final String USER = "root";
     private static final String PASS = "root";
-
 
     public DbConfig(String driver, String url, String username, String password, String configName) {
         this.driver = driver;
@@ -41,29 +40,17 @@ public class DbConfig {
         this.password = password;
         this.configName = configName;
     }
-    
+
     public DbConfig(String url, String username, String password, String configName) {
-        this.driver = DRIVER;
-        this.url = url;
-        this.username = username;
-        this.password = password;
-        this.configName = configName;
+        this(DRIVER, url, username, password, configName);
     }
-    
-    public DbConfig(String url,String configName) {
-        this.driver = DRIVER;
-        this.url = url;
-        this.username = USER;
-        this.password = PASS;
-        this.configName = configName;
+
+    public DbConfig(String url, String configName) {
+        this(DRIVER, url, USER, PASS, configName);
     }
-    
+
     public DbConfig(String configName) {
-        this.driver = DRIVER;
-        this.url = URL;
-        this.username = USER;
-        this.password = PASS;
-        this.configName = configName;
+        this(DRIVER, URL, USER, PASS, configName);
     }
 
     public DbConfig() {
@@ -117,4 +104,11 @@ public class DbConfig {
         return configName;
     }
 
+    public static String getMysqlUrl(String ip, String dbname, int port) {
+        return "jdbc:mysql://" + ip + ":" + port + "/" + dbname + "?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
+    }
+
+    public static String getMysqlUrl(String ip, String dbname) {
+        return getMysqlUrl(ip, dbname, 3306);
+    }
 }
