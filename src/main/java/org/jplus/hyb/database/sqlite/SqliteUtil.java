@@ -16,14 +16,6 @@
  */
 package org.jplus.hyb.database.sqlite;
 
-import java.awt.event.FocusEvent;
-import java.lang.reflect.Field;
-import java.sql.SQLException;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JPasswordField;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
 import org.jplus.hyb.database.config.DbConfig;
 import org.jplus.hyb.database.config.SimpleConfigurator;
 import org.jplus.hyb.database.crud.DatabaseAccess;
@@ -34,6 +26,11 @@ import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
 import org.jplus.util.NumberUtils;
 import org.jplus.util.ObjectHelper;
+
+import javax.swing.*;
+import java.awt.event.FocusEvent;
+import java.lang.reflect.Field;
+import java.sql.SQLException;
 
 /**
  *
@@ -131,6 +128,15 @@ public class SqliteUtil {
             hyberbin.insert("");
         } catch (SQLException ex) {
             log.error("setProperty key:{},value:{} error!", ex, key, value);
+        }
+    }
+
+    public static void clearProperties() {
+        DatabaseAccess databaseAccess = new DatabaseAccess(getManager());
+        try {
+            databaseAccess.update("delete from Properties");
+        } catch (SQLException ex) {
+            log.error("clearProperties error!", ex);
         }
     }
 
