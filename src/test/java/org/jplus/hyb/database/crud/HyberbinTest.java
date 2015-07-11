@@ -16,12 +16,6 @@
  */
 package org.jplus.hyb.database.crud;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.config.DbConfig;
@@ -32,19 +26,17 @@ import org.jplus.hyb.log.LocalLogger;
 import org.jplus.hyb.log.LoggerManager;
 import org.jplus.model.Servers;
 import org.jplus.util.ObjectHelper;
-import org.junit.After;
-import org.junit.AfterClass;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.*;
 
 /**
  *
@@ -113,6 +105,11 @@ public class HyberbinTest {
 
     @AfterClass
     public static void tearDownClass() {
+        try {
+            ConfigCenter.INSTANCE.getManager().finalCloseConnection();
+        } catch (SQLException e) {
+            System.out.println("初始化错误");
+        }
     }
 
     @Before

@@ -65,10 +65,10 @@ public class SqliteUtil {
 
     public static void createParmeterTable() {
         String sql = "create table properties(key text,value text);";
-        createTable(sql);
+        execute(sql);
     }
     
-    public static void createTable(String sql) {
+    public static void execute(String sql) {
         DatabaseAccess lite = new DatabaseAccess(getManager());
         try {
             lite.update(sql);
