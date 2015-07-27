@@ -1,18 +1,18 @@
 ### J-hyberbin
 
-*超简洁的数据库操作工具。
+* 超简洁的数据库操作工具。
 
-*支持mysql,oracle,sqlite,sqlserver等流行数据库，可扩展。
+* 支持mysql,oracle,sqlite,sqlserver等流行数据库，可扩展。
 
-*支持灵活开启事务。
+* 支持灵活开启事务。
 
-*支持sql参数预处理
+* 支持sql参数预处理
 
-*支持原生的sql语法，无需培训轻松上手。
+* 支持原生的sql语法，无需培训轻松上手。
 
-*支持JPA annotation注解，无须繁琐的配置文件。
+* 支持JPA annotation注解，无须繁琐的配置文件。
 
-*不依赖第三方插件
+* 不依赖第三方插件
 ---
 ### POJO定义
 ```java
