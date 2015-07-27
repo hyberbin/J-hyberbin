@@ -48,7 +48,7 @@ public class HyberbinTest {
     private static Connection CONNECTION;
 
     static {
-        LocalLogger.setLevel(LocalLogger.DEBUG);
+        LocalLogger.setLevel(LocalLogger.INFO);
         LoggerManager.setLogFactory(LoggerFactory.class);
         SimpleConfigurator.addConfigurator(new DbConfig(DbConfig.DRIVER_SQLITE, "jdbc:sqlite:data.db", "", "", DbConfig.DEFAULT_CONFIG_NAME));
         ConfigCenter.INSTANCE.setManager(new TxManager(DbConfig.DEFAULT_CONFIG_NAME) {
