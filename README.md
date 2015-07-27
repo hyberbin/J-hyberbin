@@ -31,7 +31,7 @@ public class Servers {
 }
 ```
 ---
-### 测试类
+### 代码示例(更多演示方法参见：https://github.com/hyberbin/J-hyberbin/blob/master/src/test/java/org/jplus/hyb/database/crud/HyberbinTest.java)
 ```java
 package org.jplus.hyb.database.crud;
 
@@ -96,23 +96,16 @@ public class HyberbinTest {
 
     @BeforeClass
     public static void setUpClass() {
-        DatabaseAccess lite = new DatabaseAccess(ConfigCenter.INSTANCE.getManager());
-        try {
-            Object count = lite.queryUnique("SELECT COUNT(*) FROM sqlite_master where type='table' and name='servers'");
-            if (!Integer.valueOf(1).equals(count)) {
-                String sql = "CREATE TABLE `servers` (\n"
-                        + "  `Id` integer PRIMARY KEY autoincrement,\n"
-                        + "  `name` varchar(255) DEFAULT NULL ,\n"
-                        + "  `adds` varchar(255) DEFAULT NULL,\n"
-                        + "  `note` varchar(255) DEFAULT NULL,\n"
-                        + "  `type` int(11) DEFAULT NULL\n"
-                        + ") ";
-                new DatabaseAccess(ConfigCenter.INSTANCE.getManager()).update(sql);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        if(!SqliteUtil.tableExist("servers")){
+            String sql = "CREATE TABLE `servers` (\n"
+                    + "  `Id` integer PRIMARY KEY autoincrement,\n"
+                    + "  `name` varchar(255) DEFAULT NULL ,\n"
+                    + "  `adds` varchar(255) DEFAULT NULL,\n"
+                    + "  `note` varchar(255) DEFAULT NULL,\n"
+                    + "  `type` int(11) DEFAULT NULL\n"
+                    + ") ";
+            SqliteUtil.execute(sql);
         }
-
         DatabaseAccess access = new DatabaseAccess(ConfigCenter.INSTANCE.getManager());
         try {
             int update = access.update("delete from servers");
@@ -121,7 +114,7 @@ public class HyberbinTest {
             System.out.println("初始化错误");
         }
     }
-
+    
     @AfterClass
     public static void tearDownClass() {
         try {
@@ -161,26 +154,6 @@ public class HyberbinTest {
         }
     }
 
-    /**
-     * Test of setTableName method, of class Hyberbin.
-     */
-    @Test
-    public void testSetTableName() {
-        System.out.println("setTableName");
-        String tableName = "error";
-        Servers servers = new Servers();
-        Hyberbin instance = new Hyberbin(servers);
-        instance.setTableName(tableName);
-        servers.setId(0);
-        try {
-            instance.showOnebyKey("id");
-        } catch (SQLException ex) {
-            assertTrue(ex instanceof SQLException);
-            return;
-        }
-        fail("testSetTableName faild.");
-    }
-
     public static Servers getByID(int id) {
         Servers servers = new Servers();
         servers.setId(id);
@@ -192,98 +165,7 @@ public class HyberbinTest {
         }
     }
 
-    /**
-     * Test of removeField method, of class Hyberbin.
-     */
-    @Test
-    public void testRemoveField() {
-        System.out.println("removeField");
-        String fieldName = "adds";
-        Servers servers = getByID(1);
-        String adds = servers.getAdds();
-        Hyberbin instance = new Hyberbin(servers);
-        instance.removeField(fieldName);
-        servers.setAdds("abcdefg");
-        try {
-            instance.updateByKey("id");
-        } catch (SQLException ex) {
-            fail("testRemoveField faild.");
-            ex.printStackTrace();
-        }
-        String after = getByID(1).getAdds();
-        assertEquals(after, adds);
-        assertNotSame(after, "abcdefg");
-    }
-
-    /**
-     * Test of setField method, of class Hyberbin.
-     */
-    @Test
-    public void testSetField() {
-        System.out.println("setField");
-        String fieldName = "id";
-        Servers servers = new Servers();
-        servers.setId(1);
-        Hyberbin instance = new Hyberbin(servers);
-        Hyberbin<Servers> result = instance.setField(fieldName);
-        try {
-            servers = result.showOnebyKey("id");
-        } catch (SQLException ex) {
-            fail("testSetField faild.");
-            ex.printStackTrace();
-        }
-        assertNotNull(servers.getId());
-        assertNull(servers.getAdds());
-        assertNull(servers.getName());
-        assertNull(servers.getNote());
-        assertNull(servers.getType());
-    }
-
-    /**
-     * Test of setUpdateNull method, of class Hyberbin.
-     */
-    @Test
-    public void testSetUpdateNull() {
-        System.out.println("setUpdateNull");
-        Servers servers = new Servers();
-        servers.setId(1);
-        Hyberbin instance = new Hyberbin(servers);
-        instance.setUpdateNull(true);
-        try {
-            instance.updateByKey("id");
-        } catch (SQLException ex) {
-            fail("testSetField faild.");
-            ex.printStackTrace();
-        }
-        servers = getByID(1);
-        assertNotNull(servers.getId());
-        assertNull(servers.getAdds());
-        assertNull(servers.getName());
-        assertNull(servers.getNote());
-        assertNull(servers.getType());
-    }
-
-    /**
-     * Test of addParmeter method, of class Hyberbin.
-     */
-    @Test
-    public void testAddParmeter() {
-        System.out.println("addParmeter");
-        Object parmeter = 1;
-        String sql = "select * from servers where id=?";
-        Hyberbin instance = new Hyberbin();
-        instance.addParmeter(parmeter);
-        List<Map> mapList = null;
-        try {
-            mapList = instance.getMapList(sql);
-        } catch (SQLException ex) {
-            fail("testAddParmeter faild.");
-        }
-        System.out.println(mapList);
-        assertNotNull(mapList);
-        assertTrue(ObjectHelper.isNotEmpty(mapList));
-    }
-
+   
     /**
      * Test of insert method, of class Hyberbin.
      */
@@ -321,27 +203,6 @@ public class HyberbinTest {
         }
         servers = getByID(1);
         assertEquals(servers.getName(), name);
-    }
-
-    /**
-     * Test of autoUp method, of class Hyberbin.
-     */
-    @Test
-    public void testAutoUp() {
-        System.out.println("autoUp");
-        Servers servers = getByID(1);
-        Integer type = servers.getType();
-        Hyberbin instance = new Hyberbin(servers);
-        int result = 0;
-        try {
-            result = instance.autoUp("type", "where id=1");
-        } catch (SQLException ex) {
-            fail("testUpdateByKey faild.");
-            ex.printStackTrace();
-        }
-        assertEquals(result, 1);
-        Servers byID = getByID(1);
-        assertEquals(type.longValue(), byID.getType() - 1);
     }
 
     /**
@@ -443,7 +304,6 @@ public class HyberbinTest {
             fail("testShowAll faild.");
             ex.printStackTrace();
         }
-
     }
 
     /**
@@ -540,28 +400,5 @@ public class HyberbinTest {
             fail("testGetMapList_String_Pager faild.");
         }
     }
-
-    /**
-     * Test of getNuList method, of class Hyberbin.
-     */
-    @Test
-    public void testGetNuList() {
-        System.out.println("getNuList");
-        Hyberbin instance = new Hyberbin();
-        List<FieldColumn> result = instance.getNuList();
-        assertTrue(ObjectHelper.isEmpty(result));
-    }
-
-    /**
-     * Test of addNullField method, of class Hyberbin.
-     */
-    @Test
-    public void testAddNullField() {
-        System.out.println("addNullField");
-        String field = "id";
-        Hyberbin instance = new Hyberbin(new Servers());
-        instance.addNullField(field);
-    }
-
 }
 ```
