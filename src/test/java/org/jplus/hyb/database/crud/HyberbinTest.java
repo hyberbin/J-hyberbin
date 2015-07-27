@@ -20,6 +20,7 @@ import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.config.DbConfig;
 import org.jplus.hyb.database.config.SimpleConfigurator;
+import org.jplus.hyb.database.sqlite.SqliteUtil;
 import org.jplus.hyb.database.transaction.TxManager;
 import org.jplus.hyb.database.util.Pager;
 import org.jplus.hyb.log.LocalLogger;
@@ -77,23 +78,16 @@ public class HyberbinTest {
 
     @BeforeClass
     public static void setUpClass() {
-        DatabaseAccess lite = new DatabaseAccess(ConfigCenter.INSTANCE.getManager());
-        try {
-            Object count = lite.queryUnique("SELECT COUNT(*) FROM sqlite_master where type='table' and name='servers'");
-            if (!Integer.valueOf(1).equals(count)) {
-                String sql = "CREATE TABLE `servers` (\n"
-                        + "  `Id` integer PRIMARY KEY autoincrement,\n"
-                        + "  `name` varchar(255) DEFAULT NULL ,\n"
-                        + "  `adds` varchar(255) DEFAULT NULL,\n"
-                        + "  `note` varchar(255) DEFAULT NULL,\n"
-                        + "  `type` int(11) DEFAULT NULL\n"
-                        + ") ";
-                new DatabaseAccess(ConfigCenter.INSTANCE.getManager()).update(sql);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        if(!SqliteUtil.tableExist("servers")){
+            String sql = "CREATE TABLE `servers` (\n"
+                    + "  `Id` integer PRIMARY KEY autoincrement,\n"
+                    + "  `name` varchar(255) DEFAULT NULL ,\n"
+                    + "  `adds` varchar(255) DEFAULT NULL,\n"
+                    + "  `note` varchar(255) DEFAULT NULL,\n"
+                    + "  `type` int(11) DEFAULT NULL\n"
+                    + ") ";
+            SqliteUtil.execute(sql);
         }
-
         DatabaseAccess access = new DatabaseAccess(ConfigCenter.INSTANCE.getManager());
         try {
             int update = access.update("delete from servers");
