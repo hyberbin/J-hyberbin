@@ -16,7 +16,6 @@
  */
 package org.jplus.hyb.database.bean;
 
-import javax.persistence.Id;
 import java.lang.reflect.Field;
 
 /**
@@ -34,10 +33,12 @@ public class FieldColumn {
     private boolean hasGetterAndSetter;
     /**是否被忽略 忽略的时候CRUD操作均不计*/
     private boolean ignore;
+    
+    private int sqltype;
 
     public FieldColumn(Field field, String column, int length, boolean hasGetterAndSetter, boolean ignore) {
         this.field = field;
-        this.column = column;
+        this.column = column.toUpperCase();
         this.length = length;
         this.hasGetterAndSetter = hasGetterAndSetter;
         this.ignore = ignore;
@@ -59,7 +60,7 @@ public class FieldColumn {
     }
 
     public void setColumn(String column) {
-        this.column = column;
+        this.column = column.toUpperCase();
     }
 
     public boolean isHasGetterAndSetter() {
@@ -84,6 +85,14 @@ public class FieldColumn {
 
     public void setIgnore(boolean ignore) {
         this.ignore = ignore;
+    }
+
+    public int getSqltype() {
+        return sqltype;
+    }
+
+    public void setSqltype(int sqltype) {
+        this.sqltype = sqltype;
     }
 
 

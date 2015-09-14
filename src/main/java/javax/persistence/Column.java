@@ -20,6 +20,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.sql.SQLType;
 
 @Target(value = {ElementType.METHOD, ElementType.FIELD})
 @Retention(value = RetentionPolicy.RUNTIME)
@@ -44,4 +45,6 @@ public @interface Column {
     public int precision() default 0;
 
     public int scale() default 0;
+    
+    public int sqltype() default -1;
 }

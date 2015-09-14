@@ -18,9 +18,9 @@ package org.jplus.hyb.database.bean;
 
 import org.jplus.util.ObjectHelper;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jplus.util.IgnoreCaseMap;
 
 /**
  *
@@ -55,7 +55,7 @@ public class TableBean {
 
     public void setColumns(List<FieldColumn> columns) {
         this.columns = columns;
-        this.columnMap = new HashMap<String, FieldColumn>();
+        this.columnMap = new IgnoreCaseMap<String, FieldColumn>();
         if (ObjectHelper.isNotEmpty(columns)) {
             for (FieldColumn column : columns) {
                 columnMap.put(column.getColumn(), column);

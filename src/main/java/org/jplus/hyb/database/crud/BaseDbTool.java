@@ -18,6 +18,9 @@ package org.jplus.hyb.database.crud;
 
 import java.sql.Connection;
 import org.jplus.hyb.database.adapter.IAdapter;
+import org.jplus.hyb.database.adapter.MysqlAdapter;
+import org.jplus.hyb.database.adapter.OracleAdapter;
+import org.jplus.hyb.database.adapter.SqlserverAdapter;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.transaction.IDbManager;
 import org.jplus.hyb.log.Logger;
@@ -31,12 +34,24 @@ public abstract class BaseDbTool {
 
     protected final Logger log = LoggerManager.getLogger(getClass());
     /** 数据适配器 默认是mysql适配器 */
-    protected IAdapter adapter = ConfigCenter.INSTANCE.getDefaultAdapter();
+    protected IAdapter adapter;
     /** 数据库连接对象 */
     protected IDbManager tx;
 
     protected BaseDbTool(IDbManager tx) {
         this.tx = tx;
+        String driver = tx.getDefaultDbConfig().getDriver();
+        if(driver.contains("oracle")){
+            adapter=new OracleAdapter();
+        }else if(driver.contains("mysql")){
+            adapter=new MysqlAdapter();
+        }else if(driver.contains("sqlite")){
+            adapter=new MysqlAdapter();
+        }else if(driver.contains("sqlserver")){
+            adapter=new SqlserverAdapter();
+        }else{
+            adapter= ConfigCenter.INSTANCE.getDefaultAdapter();
+        }
     }
 
     /**

@@ -14,20 +14,37 @@
  * limitations under the License.
  * Email:hyberbin@qq.com
  */
-package org.jplus.hyb.database.util;
+package org.jplus.util;
 
-import java.util.List;
-import org.jplus.hyb.database.bean.ParmeterPair;
+import java.util.HashMap;
 
 /**
  *
- * @author Hyberbin
+ * @author hyberbin
  */
-public interface ISqlout {
+public class IgnoreCaseMap<K, V> extends HashMap<K, V> {
 
-    public void sqlout(String sql, List<ParmeterPair> parmeters);
-    
-    public void setSqlout(boolean needout);
-    
-    public boolean isSqlout();
+    public IgnoreCaseMap() {
+        super();
+    }
+
+    public IgnoreCaseMap(K key, V v) {
+        put(key, v);
+    }
+
+    public IgnoreCaseMap linkPut(K key, V value) {
+        put(key, value);
+        return this;
+    }
+
+    @Override
+    public V get(Object key) {
+        return super.get(key instanceof String?key.toString().toLowerCase():key);
+    }
+
+    @Override
+    public V put(K key, V value) {
+        return super.put(key instanceof String?(K) key.toString().toLowerCase():key, value);
+    }
+
 }

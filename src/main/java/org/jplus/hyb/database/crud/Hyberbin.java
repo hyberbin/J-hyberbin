@@ -37,11 +37,11 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jplus.util.IgnoreCaseMap;
 
 /**
  * 数据库持久层框架核心类之一 此类用于给定POJO类的数据库操作.
@@ -267,7 +267,10 @@ public class Hyberbin<T> extends BaseDbTool {
     private void loadDataToPojo(Object table, FieldColumn fieldColumn, ResultSet rs) throws SQLException {
         log.trace("in loadDataToPojo ");
         Class type = fieldColumn.getField().getType();
-        Object getResultSet = rs.getObject(fieldColumn.getColumn());
+        Object getResultSet = rs.getObject(fieldColumn.getColumn(),type);
+        if(getResultSet==null){
+            getResultSet = rs.getObject(fieldColumn.getColumn());
+        }
         if (getResultSet != null && !type.isAssignableFrom(getResultSet.getClass())) {
             getResultSet = ConverString.asType(type, getResultSet);
         }
@@ -600,7 +603,7 @@ public class Hyberbin<T> extends BaseDbTool {
                 fields.add(new FieldColumn(null, metaData.getColumnName(i), 0, false, true));
             }
             while (rs.next()) {
-                Map<String, Object> map = new MyMap<String, Object>();
+                Map<String, Object> map = new IgnoreCaseMap<String, Object>();
                 for (int i = 1; i <= columnCount; i++) {
                     map.put(metaData.getColumnName(i), rs.getObject(i));
                 }
@@ -667,18 +670,4 @@ public class Hyberbin<T> extends BaseDbTool {
     public String getPrimaryKey() {
         return primaryKey;
     }
-}
-
-class MyMap<K, V> extends HashMap<K, V> {
-
-    @Override
-    public V get(Object key) {
-        return super.get(key.toString().toLowerCase());
-    }
-
-    @Override
-    public V put(K key, V value) {
-        return super.put((K) key.toString().toLowerCase(), value);
-    }
-
 }

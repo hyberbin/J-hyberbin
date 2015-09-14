@@ -126,11 +126,13 @@ public class FieldUtil {
             Column annotation = field.getAnnotation(Column.class);
             fieldColumn.setColumn(annotation.name());
             fieldColumn.setLength(annotation.length());
+            fieldColumn.setSqltype(annotation.sqltype());
         } else if (field.isAnnotationPresent(Transient.class)) {
             fieldColumn.setIgnore(true);
         } else if (field.isAnnotationPresent(JoinColumn.class)) {
             JoinColumn annotation = field.getAnnotation(JoinColumn.class);
             fieldColumn.setColumn(annotation.name());
+            fieldColumn.setSqltype(annotation.sqltype());
         }
         if (ObjectHelper.isNullOrEmptyString(fieldColumn.getColumn())) {
             fieldColumn.setColumn(field.getName());

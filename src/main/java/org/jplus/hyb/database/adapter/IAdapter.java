@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import org.jplus.hyb.database.bean.FieldColumn;
 import org.jplus.hyb.database.util.Pager;
 
 /**
@@ -33,6 +34,13 @@ public interface IAdapter {
      * @param o
      */
     public void addParameter(Object o);
+    
+    /**
+     * 添加预处理参数
+     * @param o
+     * @param fieldColumn
+     */
+    public void addParameter(Object o,FieldColumn fieldColumn);
 
     /**
      * 获得预处理参数

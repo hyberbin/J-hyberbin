@@ -19,6 +19,7 @@ package org.jplus.hyb.database.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import org.jplus.hyb.database.bean.ParmeterPair;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.util.ObjectHelper;
 
@@ -32,11 +33,12 @@ public class SimpleSqlout implements ISqlout {
     private Boolean needout;
 
     @Override
-    public void sqlout(String sql, List parmeters) {
+    public void sqlout(String sql, List<ParmeterPair> parmeters) {
         if (isSqlout()) {
             if (ObjectHelper.isNotEmpty(parmeters)) {
                 try {
-                    for (Object o : parmeters) {
+                    for (ParmeterPair parmeter : parmeters) {
+                        Object o = parmeter.getParmeter();
                         if (o != null) {
                             if (o instanceof Number) {
                                 sql = sql.replaceFirst("[?]", o + "");

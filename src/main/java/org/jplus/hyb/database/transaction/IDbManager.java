@@ -18,6 +18,7 @@ package org.jplus.hyb.database.transaction;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.jplus.hyb.database.config.DbConfig;
 import org.jplus.hyb.database.config.IConfigurator;
 
 /**
@@ -41,4 +42,6 @@ public interface IDbManager {
     public void setConfigurator(IConfigurator configurator);
     
     public IDbManager newInstance();
+    
+    public DbConfig getDefaultDbConfig();
 }

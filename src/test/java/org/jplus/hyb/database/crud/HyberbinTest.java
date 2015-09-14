@@ -182,8 +182,8 @@ public class HyberbinTest {
         try {
             instance.updateByKey("id");
         } catch (SQLException ex) {
-            fail("testRemoveField faild.");
             ex.printStackTrace();
+            fail("testRemoveField faild.");
         }
         String after = getByID(1).getAdds();
         assertEquals(after, adds);

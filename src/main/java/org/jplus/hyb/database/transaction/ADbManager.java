@@ -37,13 +37,22 @@ public abstract class ADbManager implements IDbManager {
     protected Connection connection;
     protected String defaultConfig = DbConfig.DEFAULT_CONFIG_NAME;
     protected IConfigurator configurator = SimpleConfigurator.INSTANCE;
+    protected DbConfig defaultDbConfig;
     /**
      * 数据库名称.
      * @param defaultConfig 
      */
     public ADbManager(String defaultConfig) {
         this.defaultConfig = defaultConfig;
+        defaultDbConfig=configurator.getDbConfig(defaultConfig);
     }
+
+    @Override
+    public DbConfig getDefaultDbConfig() {
+        return defaultDbConfig;
+    }
+    
+    
     /**
      * 获取默认数据连接.
      * @return 

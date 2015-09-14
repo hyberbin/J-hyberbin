@@ -40,4 +40,6 @@ public @interface JoinColumn {
     public String columnDefinition() default "";
 
     public String table() default "";
+    
+    public int sqltype() default -1;
 }

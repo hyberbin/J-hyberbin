@@ -22,6 +22,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import org.jplus.hyb.database.bean.FieldColumn;
+import org.jplus.hyb.database.bean.ParmeterPair;
 import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.util.ISqlout;
 import org.jplus.hyb.log.Logger;
@@ -36,7 +38,7 @@ public abstract class AAdapter implements IAdapter {
 
     protected static final Logger log = LoggerManager.getLogger(AAdapter.class);
     /** 预处理参数 */
-    protected List parmeters = new ArrayList(0);
+    protected List<ParmeterPair> parmeters = new ArrayList(0);
     protected String sql;
 
     protected Statement createStatement(Connection conn, String sql) throws SQLException {
@@ -48,8 +50,13 @@ public abstract class AAdapter implements IAdapter {
             stm = conn.prepareStatement(sql);
             int index = 1;
             if (ObjectHelper.isNotEmpty(parmeters)) {
-                for (Object parmeter : parmeters) {
-                    ((PreparedStatement) stm).setObject(index++, parmeter);
+                for (ParmeterPair parmeter : parmeters) {
+                    FieldColumn fieldColumn = parmeter.getFieldColumn();
+                    if(fieldColumn!=null&&fieldColumn.getSqltype()!=-1){
+                        ((PreparedStatement) stm).setObject(index++, parmeter.getParmeter(),fieldColumn.getSqltype());
+                    }else{
+                        ((PreparedStatement) stm).setObject(index++, parmeter.getParmeter());
+                    }
                 }
             }
         } else {
@@ -62,7 +69,13 @@ public abstract class AAdapter implements IAdapter {
     @Override
     public void addParameter(Object o) {
         log.trace("addParameter {}", o);
-        parmeters.add(o);
+        parmeters.add(new ParmeterPair(o, null));
+    }
+    
+    @Override
+    public void addParameter(Object o,FieldColumn fieldColumn) {
+        log.trace("addParameter {}", o);
+        parmeters.add(new ParmeterPair(o, fieldColumn));
     }
 
     @Override
@@ -82,5 +95,5 @@ public abstract class AAdapter implements IAdapter {
             }
         }
     }
-
+    
 }

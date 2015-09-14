@@ -31,6 +31,8 @@ import javax.swing.*;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -39,8 +41,10 @@ import java.sql.SQLException;
 public class SqliteUtil {
 
     private static final Logger log = LoggerManager.getLogger(SqliteUtil.class);
+    private static final Map<String,String> PropertiesMap=new HashMap<String, String>();
 
     static {
+        SimpleConfigurator.addConfigurator(new DbConfig("org.sqlite.JDBC", "jdbc:sqlite:data.db", "", "", "sqlite"));
         if (!tableExist("properties")) {
             createParmeterTable();
         }
@@ -48,7 +52,6 @@ public class SqliteUtil {
 
     public static IDbManager getManager() {
         IDbManager manager = new SimpleManager("sqlite");
-        SimpleConfigurator.addConfigurator(new DbConfig("org.sqlite.JDBC", "jdbc:sqlite:data.db", "", "", "sqlite"));
         return manager;
     }
 
@@ -78,47 +81,41 @@ public class SqliteUtil {
     }
 
     public static String getProperty(String key) {
-        String sql = "select value from properties where key ='" + key + "'";
-        DatabaseAccess lite = new DatabaseAccess(getManager());
-        try {
-            Object value = lite.queryUnique(sql);
-            return value == null ? null : value.toString();
-        } catch (SQLException ex) {
-            log.error("getProperty error key:{}", ex, key);
+        String pvalue = PropertiesMap.get(key);
+        if(pvalue==null){
+            String sql = "select value from properties where key ='" + key + "'";
+            DatabaseAccess lite = new DatabaseAccess(getManager());
+            try {
+                Object value = lite.queryUnique(sql);
+                pvalue=value == null ? "" : value.toString();
+            } catch (SQLException ex) {
+                log.error("getProperty error key:{}", ex, key);
+            }
         }
-        return null;
+        PropertiesMap.put(key,pvalue);
+        return pvalue;
     }
 
     public static boolean getBoolProperty(String key) {
-
-        String sql = "select value from properties where key ='" + key + "'";
-        DatabaseAccess lite = new DatabaseAccess(getManager());
-        try {
-            Object value = lite.queryUnique(sql);
-            return value == null ? false : "true".equalsIgnoreCase(value.toString());
-        } catch (SQLException ex) {
-            log.error("getProperty error key:{}", ex, key);
-        }
-        return false;
+        String pvalue =getProperty(key);
+        return pvalue == null ? false : "true".equalsIgnoreCase(pvalue);
     }
 
     public static Long getLongProperty(String key) {
-        String sql = "select value from properties where key ='" + key + "'";
-        DatabaseAccess lite = new DatabaseAccess(getManager());
-        try {
-            Object value = lite.queryUnique(sql);
-            return value == null ? 0 : NumberUtils.parseDouble(value).longValue();
-        } catch (SQLException ex) {
-            log.error("getProperty error key:{}", ex, key);
-        }
-        return 0l;
+        String pvalue =getProperty(key);
+        return pvalue == null ? 0 : NumberUtils.parseDouble(pvalue).longValue();
     }
 
     public static void setProperty(String key, String value) {
         if (ObjectHelper.isNullOrEmptyString(key) ){
             return ;
-        }else if( ObjectHelper.isNullOrEmptyString(value)) {
+        }
+        if( ObjectHelper.isNullOrEmptyString(value)) {
             value = "";
+        }
+        String pvalue =getProperty(key);
+        if(value.equals(pvalue)){
+            return;
         }
         Properties property = new Properties(key, value);
         Hyberbin<Properties> hyberbin = new Hyberbin(property, getManager());
@@ -126,6 +123,7 @@ public class SqliteUtil {
             hyberbin.deleteByKey("key");
             hyberbin = new Hyberbin(property, getManager());
             hyberbin.insert("");
+            PropertiesMap.put(key,value);
         } catch (SQLException ex) {
             log.error("setProperty key:{},value:{} error!", ex, key, value);
         }
@@ -135,6 +133,7 @@ public class SqliteUtil {
         DatabaseAccess databaseAccess = new DatabaseAccess(getManager());
         try {
             databaseAccess.update("delete from Properties");
+            PropertiesMap.clear();
         } catch (SQLException ex) {
             log.error("clearProperties error!", ex);
         }
@@ -180,6 +179,17 @@ public class SqliteUtil {
         });
     }
 
+    public static void bindJCheckBoxField(final JCheckBox field, final String name) {
+        field.setSelected(getBoolProperty(name));
+        field.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                setProperty(name, field.isSelected() + "");
+            }
+
+        });
+    }
+
     public static void bindJComboxField(final JComboBox field, final String name) {
         field.setSelectedItem(getProperty(name));
         field.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -204,6 +214,13 @@ public class SqliteUtil {
                 try {
                     field.setAccessible(true);
                     bindJRadioField((JRadioButton) field.get(frame), field.getName());
+                } catch (Exception ex) {
+                    log.error("绑定事件错误", ex);
+                }
+            } else if (JCheckBox.class.isAssignableFrom(field.getType())) {
+                try {
+                    field.setAccessible(true);
+                    bindJCheckBoxField((JCheckBox) field.get(frame), field.getName());
                 } catch (Exception ex) {
                     log.error("绑定事件错误", ex);
                 }
