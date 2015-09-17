@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import org.jplus.hyb.database.util.Pager;
+import org.jplus.util.NumberUtils;
 
 /**
  * Oracle适配器
@@ -53,7 +54,7 @@ public class OracleAdapter extends AAdapter {
 
     @Override
     public ResultSet findSingle(Connection connection, String sql) throws SQLException {
-        return findList(connection, "select res.*,rownum from (" + sql + ") res where rownum=0");
+        return findList(connection, "select res.*,rownum from (" + sql + ") res where rownum=1");
     }
 
     @Override
@@ -72,4 +73,18 @@ public class OracleAdapter extends AAdapter {
         }
     }
 
+    /**
+     * 查询总数
+     *
+     * @param connection 数据库连接
+     * @param sql        sql语句
+     * @return 查到的结果
+     * @throws SQLException
+     */
+    @Override
+    public int getCount(Connection connection, String sql) throws SQLException {
+        sql = "select count(*) from (" + sql + ")";
+        Object findUnique =findUnique(connection, sql);
+        return NumberUtils.parseInt(findUnique);
+    }
 }

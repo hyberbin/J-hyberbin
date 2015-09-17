@@ -86,6 +86,15 @@ public interface IAdapter {
     public Object findUnique(Connection connection,String sql) throws SQLException;
 
     /**
+     * 查询总数
+     * @param connection 数据库连接
+     * @param sql sql语句
+     * @return 查到的结果
+     * @throws java.sql.SQLException
+     */
+    public int getCount(Connection connection,String sql) throws SQLException;
+
+    /**
      * 更新操作
      * @param connection 数据库连接
      * @param sql sql语句

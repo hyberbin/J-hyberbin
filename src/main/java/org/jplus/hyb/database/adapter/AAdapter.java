@@ -28,6 +28,7 @@ import org.jplus.hyb.database.config.ConfigCenter;
 import org.jplus.hyb.database.util.ISqlout;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
+import org.jplus.util.NumberUtils;
 import org.jplus.util.ObjectHelper;
 
 /**
@@ -82,6 +83,21 @@ public abstract class AAdapter implements IAdapter {
     public List getParmeters() {
         log.trace("in getParmeters");
         return parmeters;
+    }
+
+    /**
+     * 查询总数
+     *
+     * @param connection 数据库连接
+     * @param sql        sql语句
+     * @return 查到的结果
+     * @throws SQLException
+     */
+    @Override
+    public int getCount(Connection connection, String sql) throws SQLException {
+        sql = "select count(*) from (" + sql + ") as count";
+        Object findUnique =findUnique(connection, sql);
+        return NumberUtils.parseInt(findUnique);
     }
 
     @Override

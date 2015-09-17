@@ -544,10 +544,9 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public int getCount(String sql) throws SQLException {
         log.trace("in getCount");
-        sql = "select count(*) from (" + sql + ") as count";
-        Object findUnique = adapter.findUnique(getConnection(), sql);
+        int count = NumberUtils.parseInt(adapter.getCount(getConnection(), sql));
         tx.closeConnection();
-        return NumberUtils.parseInt(findUnique);
+        return count;
     }
 
     /**
@@ -563,9 +562,7 @@ public class Hyberbin<T> extends BaseDbTool {
         ResultSet rs = adapter.findPageList(getConnection(), sql, pager);
         List list = loadListData(getPo(), rs);
         tx.closeConnection();
-        sql = "select count(*) from (" + sql + ") as count";
-        Object findUnique = adapter.findUnique(getConnection(), sql);
-        pager.setItems(NumberUtils.parseInt(findUnique));
+        pager.setItems(NumberUtils.parseInt(adapter.getCount(getConnection(), sql)));
         pager.setData(list);
         tx.closeConnection();
     }
@@ -639,9 +636,7 @@ public class Hyberbin<T> extends BaseDbTool {
         ResultSet findPageList = adapter.findPageList(getConnection(), sql, pager);
         pager.setData(getMapList(findPageList));
         tx.closeConnection();
-        sql = "select count(*) from (" + sql + ") as count";
-        Object findUnique = adapter.findUnique(getConnection(), sql);
-        pager.setItems(NumberUtils.parseInt(findUnique));
+        pager.setItems(adapter.getCount(getConnection(), sql));
         tx.closeConnection();
     }
 
