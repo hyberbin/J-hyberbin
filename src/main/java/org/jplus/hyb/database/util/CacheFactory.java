@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.jplus.util.Reflections;
 
 /**
  * 缓存工厂
@@ -84,7 +85,7 @@ public class CacheFactory {
             } else {
                 tableBean.setTableName(po.getSimpleName());
             }
-            Field[] declaredFields = po.getDeclaredFields();
+            Field[] declaredFields = Reflections.getAllFields(po).toArray(new Field[]{});
             List<FieldColumn> columns = new ArrayList<FieldColumn>(0);
             for (Field field : declaredFields) {
                 columns.add(FieldUtil.getFieldColumn(field));
