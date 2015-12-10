@@ -63,8 +63,10 @@ public class Hyberbin<T> extends BaseDbTool {
     private boolean updateNull = false;
     /** 为空的字段列表 */
     private List<FieldColumn> nuList;
-
+    /**主键字段名*/
     private String primaryKey="id";
+    /**是否解析父类的字段*/
+    private boolean superField=true;
 
     /**
      * 根据表的实体类初始化.
@@ -73,7 +75,7 @@ public class Hyberbin<T> extends BaseDbTool {
     private void ini(T po) {
         if (po != null) {
             try {
-                TableBean tableBean = CacheFactory.MINSTANCE.getHyberbin(po.getClass());
+                TableBean tableBean = CacheFactory.MINSTANCE.getHyberbin(po.getClass(),superField);
                 this.po = po;
                 this.tableName = tableBean.getTableName();
                 this.primaryKey=tableBean.getPrimaryKey();
@@ -120,6 +122,31 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public Hyberbin(T tablebean, IDbManager tx) {
         super(tx);//数据库操作对象
+        ini(tablebean);
+    }
+    
+    /**
+     * 构造方法. 如果所传参数只是事务管理器那么部分方法不可用.
+     * @param tablebean 表的实体类或者事务管理器
+     * @param superField 是否解析父类的字段
+     */
+    public Hyberbin(T tablebean,boolean superField) {
+        super(tablebean instanceof IDbManager ? (IDbManager) tablebean : ConfigCenter.INSTANCE.getManager());//数据库操作对象
+        if (!(tablebean instanceof IDbManager)) {
+            this.superField=superField;
+            ini(tablebean);
+        }
+    }
+
+    /**
+     * 用自带的事务管理器进行数据库操作.
+     * @param tablebean 表的实体类
+     * @param tx 事务管理器
+     * @param superField 是否解析父类的字段
+     */
+    public Hyberbin(T tablebean, IDbManager tx,boolean superField) {
+        super(tx);//数据库操作对象
+        this.superField=superField;
         ini(tablebean);
     }
 

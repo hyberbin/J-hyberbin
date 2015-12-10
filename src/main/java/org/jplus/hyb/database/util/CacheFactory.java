@@ -72,9 +72,10 @@ public class CacheFactory {
     /**
      * 返回PO类字段信息
      * @param po PO类
+     * @param superField 是否解析超类的字段
      * @return
      */
-    public TableBean getHyberbin(Class po) {
+    public TableBean getHyberbin(Class po,boolean superField) {
         log.trace("in getHyberbin");
         TableBean tableBean = hyberbinMap.get(po);
         if (tableBean == null) {
@@ -85,7 +86,7 @@ public class CacheFactory {
             } else {
                 tableBean.setTableName(po.getSimpleName());
             }
-            Field[] declaredFields = Reflections.getAllFields(po).toArray(new Field[]{});
+            Field[] declaredFields =superField? Reflections.getAllFields(po).toArray(new Field[]{}):po.getDeclaredFields();
             List<FieldColumn> columns = new ArrayList<FieldColumn>(0);
             for (Field field : declaredFields) {
                 columns.add(FieldUtil.getFieldColumn(field));
@@ -108,7 +109,7 @@ public class CacheFactory {
      */
     public FieldColumn getFieldColumn(Class po, String fieldName) {
         log.trace("in getFieldColumn");
-        TableBean hyberbin = getHyberbin(po);
+        TableBean hyberbin = getHyberbin(po,true);
         return hyberbin.getColumnMap().get(fieldName);
     }
 
