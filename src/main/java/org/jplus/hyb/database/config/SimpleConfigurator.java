@@ -16,6 +16,7 @@
  */
 package org.jplus.hyb.database.config;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ import java.util.Map;
  */
 public final class SimpleConfigurator implements IConfigurator {
 
-    private static final Map<String, DbConfig> DBCONFIGS = new HashMap<String, DbConfig>();
+    private static final Map<String, DbConfig> DBCONFIGS = Collections.synchronizedMap(new HashMap<String, DbConfig>());
     public static final SimpleConfigurator INSTANCE = new SimpleConfigurator();
 
     static {//自动添加一个默认的配置

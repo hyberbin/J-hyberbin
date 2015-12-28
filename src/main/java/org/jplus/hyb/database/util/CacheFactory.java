@@ -28,6 +28,7 @@ import javax.persistence.Table;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,12 +45,12 @@ public class CacheFactory {
     /** 此对象唯一的实例 */
     public static CacheFactory MINSTANCE = new CacheFactory();
     /** 所有Po信息映射集合 */
-    private final HashMap<Class, TableBean> hyberbinMap = new HashMap<Class, TableBean>();
+    private final Map<Class, TableBean> hyberbinMap = Collections.synchronizedMap(new HashMap<Class, TableBean>());
     /** *所有的方法映射集合
      * 在参数个数为0或者1的时候String是方法名+参数个数，其它时候String是方法名+各参数的类型名 */
-    private final Map<Class, Map<String, Method>> methodMap = new HashMap<Class, Map<String, Method>>();
+    private final Map<Class, Map<String, Method>> methodMap = Collections.synchronizedMap(new HashMap<Class, Map<String, Method>>());
     /** 所有字段映射集合* */
-    private final Map<Class, Map<String, Field>> fieldMap = new HashMap<Class, Map<String, Field>>();
+    private final Map<Class, Map<String, Field>> fieldMap = Collections.synchronizedMap(new HashMap<Class, Map<String, Field>>());
 
     /**
      * 私有构造方法不允许其它类实例化
@@ -125,7 +126,7 @@ public class CacheFactory {
         Class clazz = o instanceof Class ? ((Class) o) : o.getClass();
         Map<String, Method> objectMethodMap = methodMap.get(clazz);
         if (objectMethodMap == null) {
-            objectMethodMap = new HashMap<String, Method>();
+            objectMethodMap = Collections.synchronizedMap(new HashMap<String, Method>());
             methodMap.put(clazz, objectMethodMap);
         }
         String key =method.getName()+getTypes(types);
@@ -172,7 +173,7 @@ public class CacheFactory {
         log.trace("in putField:put class {},fieldName {}", clazz.getName(), field.getName());
         Map<String, Field> fields = fieldMap.get(clazz);
         if (fields == null) {
-            fields = new HashMap<String, Field>();
+            fields = Collections.synchronizedMap(new HashMap<String, Field>());
             fieldMap.put(clazz, fields);
         }
         fields.put(field.getName(), field);

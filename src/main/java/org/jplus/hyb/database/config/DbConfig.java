@@ -29,9 +29,13 @@ public class DbConfig {
     public static final String DRIVER_SQLSERVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     private static final String DRIVER = DRIVER_MYSQL;
 
-    private static final String URL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
-    private static final String USER = "root";
-    private static final String PASS = "root";
+    public static final String URL_MYSQL = "jdbc:mysql://localhost:3306/test?useUnicode=true&characterEncoding=UTF-8&generateSimpleParameterMetadata=true&useOldAliasMetadataBehavior=true&UseOldSyntax=true";
+    public static final String URL_ORACLE = "jdbc:oracle:thin:@localhost:1521:ORCL";
+    public static final String URL_SQLITE = "jdbc:sqlite:data.db";
+    public static final String URL_SQLSERVER = "jdbc:microsoft:sqlserver://localhost:1433;DatabaseName";
+    
+    public static final String USER = "root";
+    public static final String PASS = "root";
 
     public DbConfig(String driver, String url, String username, String password, String configName) {
         this.driver = driver;
@@ -42,15 +46,15 @@ public class DbConfig {
     }
 
     public DbConfig(String url, String username, String password, String configName) {
-        this(DRIVER, url, username, password, configName);
+        this(getDriverFromUrl(url), url, username, password, configName);
     }
 
     public DbConfig(String url, String configName) {
-        this(DRIVER, url, USER, PASS, configName);
+        this(getDriverFromUrl(url), url, USER, PASS, configName);
     }
 
     public DbConfig(String configName) {
-        this(DRIVER, URL, USER, PASS, configName);
+        this(DRIVER, URL_MYSQL, USER, PASS, configName);
     }
 
     public DbConfig() {
@@ -110,5 +114,19 @@ public class DbConfig {
 
     public static String getMysqlUrl(String ip, String dbname) {
         return getMysqlUrl(ip, dbname, 3306);
+    }
+    
+    public static String getDriverFromUrl(String url){
+        if(url.contains("oracle")){
+            return DRIVER_ORACLE;
+        }else if(url.contains("mysql")){
+            return DRIVER_MYSQL;
+        }else if(url.contains("sqlite")){
+            return DRIVER_SQLITE;
+        }else if(url.contains("sqlserver")){
+            return DRIVER_SQLSERVER;
+        }else{
+            return DRIVER;
+        }
     }
 }

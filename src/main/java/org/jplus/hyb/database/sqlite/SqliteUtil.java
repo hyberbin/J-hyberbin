@@ -21,7 +21,6 @@ import org.jplus.hyb.database.config.SimpleConfigurator;
 import org.jplus.hyb.database.crud.DatabaseAccess;
 import org.jplus.hyb.database.crud.Hyberbin;
 import org.jplus.hyb.database.transaction.IDbManager;
-import org.jplus.hyb.database.transaction.SimpleManager;
 import org.jplus.hyb.log.Logger;
 import org.jplus.hyb.log.LoggerManager;
 import org.jplus.util.NumberUtils;
@@ -31,8 +30,10 @@ import javax.swing.*;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.jplus.hyb.database.transaction.SingleManager;
 
 /**
  *
@@ -41,7 +42,7 @@ import java.util.Map;
 public class SqliteUtil {
 
     private static final Logger log = LoggerManager.getLogger(SqliteUtil.class);
-    private static final Map<String,String> PropertiesMap=new HashMap<String, String>();
+    private static final Map<String,String> PropertiesMap=Collections.synchronizedMap(new HashMap<String, String>());
 
     static {
         SimpleConfigurator.addConfigurator(new DbConfig("org.sqlite.JDBC", "jdbc:sqlite:data.db", "", "", "sqlite"));
@@ -49,12 +50,30 @@ public class SqliteUtil {
             createParmeterTable();
         }
     }
-
-    public static IDbManager getManager() {
-        IDbManager manager = new SimpleManager("sqlite");
+    /**
+     * 获取Sqlite的连接管理器.
+     * 不提交事务可以加快操作速度.
+     * @param commit 是否提交事务.
+     * @return 
+     */
+    public static IDbManager getManager(final boolean... commit) {
+        IDbManager manager = new SingleManager("sqlite"){
+            @Override
+            public synchronized void commit() throws SQLException {
+                if(commit.length>0&&!commit[0]){
+                    return;
+                }else{
+                    super.commit(); 
+                }
+            }
+        };
         return manager;
     }
-
+    /**
+     * 表是否存在.
+     * @param tableName 表名
+     * @return 
+     */
     public static boolean tableExist(String tableName) {
         DatabaseAccess lite = new DatabaseAccess(getManager());
         try {
@@ -65,12 +84,17 @@ public class SqliteUtil {
         }
         return false;
     }
-
+    /**
+     * 创建属性表.
+     */
     public static void createParmeterTable() {
         String sql = "create table properties(key text,value text);";
         execute(sql);
     }
-    
+    /**
+     * 执行sql语句.
+     * @param sql 
+     */
     public static void execute(String sql) {
         DatabaseAccess lite = new DatabaseAccess(getManager());
         try {
@@ -79,12 +103,17 @@ public class SqliteUtil {
             log.error("create table error", ex);
         }
     }
-
+    /**
+     * 获取属性.
+     * 由于不会对数据库产生数据影响这里都不关闭数据库和提交事务.
+     * @param key
+     * @return 
+     */
     public static String getProperty(String key) {
         String pvalue = PropertiesMap.get(key);
         if(pvalue==null){
             String sql = "select value from properties where key ='" + key + "'";
-            DatabaseAccess lite = new DatabaseAccess(getManager());
+            DatabaseAccess lite = new DatabaseAccess(getManager(false));
             try {
                 Object value = lite.queryUnique(sql);
                 pvalue=value == null ? "" : value.toString();
@@ -95,18 +124,32 @@ public class SqliteUtil {
         PropertiesMap.put(key,pvalue);
         return pvalue;
     }
-
+    /**
+     * 获取对应属性名的布尔值.
+     * @param key 属性名.
+     * @return 
+     */
     public static boolean getBoolProperty(String key) {
         String pvalue =getProperty(key);
         return pvalue == null ? false : "true".equalsIgnoreCase(pvalue);
     }
-
+    /**
+     * 获取对应属性名的长整型值.
+     * @param key 属性名.
+     * @return 
+     */
     public static Long getLongProperty(String key) {
         String pvalue =getProperty(key);
         return pvalue == null ? 0 : NumberUtils.parseDouble(pvalue).longValue();
     }
-
-    public static void setProperty(String key, String value) {
+    /**
+     * 设置一个属性名和对应的值.
+     * 如果缓存中已经有一样的值则不对数据库操作反之则更新数据库.
+     * @param key 属性名.
+     * @param value 属性对应的值.
+     * @param commit 是否提交事务.
+     */
+    public static void setProperty(String key, String value,boolean... commit ) {
         if (ObjectHelper.isNullOrEmptyString(key) ){
             return ;
         }
@@ -118,17 +161,19 @@ public class SqliteUtil {
             return;
         }
         Properties property = new Properties(key, value);
-        Hyberbin<Properties> hyberbin = new Hyberbin(property, getManager());
+        Hyberbin<Properties> hyberbin = new Hyberbin(property, getManager(commit));
         try {
             hyberbin.deleteByKey("key");
-            hyberbin = new Hyberbin(property, getManager());
+            hyberbin = new Hyberbin(property, getManager(commit));
             hyberbin.insert("");
             PropertiesMap.put(key,value);
         } catch (SQLException ex) {
             log.error("setProperty key:{},value:{} error!", ex, key, value);
         }
     }
-
+    /**
+     * 清空缓存.
+     */
     public static void clearProperties() {
         DatabaseAccess databaseAccess = new DatabaseAccess(getManager());
         try {
@@ -138,7 +183,11 @@ public class SqliteUtil {
             log.error("clearProperties error!", ex);
         }
     }
-
+    /**
+     * 下面是一些扩展方法,在窗体中如果对象失去焦点则将对象名和值放入缓存.
+     * @param field
+     * @param name 
+     */
     public static void bindJTextField(final JTextField field, final String name) {
         field.setText(getProperty(name));
         field.addFocusListener(new java.awt.event.FocusAdapter() {

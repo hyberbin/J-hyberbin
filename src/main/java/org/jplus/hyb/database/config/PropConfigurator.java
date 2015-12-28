@@ -18,6 +18,7 @@ package org.jplus.hyb.database.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.jplus.hyb.log.Logger;
@@ -42,7 +43,7 @@ public class PropConfigurator implements IConfigurator {
 
     private static final Logger log = LoggerManager.getLogger(PropConfigurator.class);
     private final LoadProperties dbProperties;
-    private static final Map<String, DbConfig> configMap = new HashMap<String, DbConfig>();
+    private static final Map<String, DbConfig> configMap = Collections.synchronizedMap(new HashMap<String, DbConfig>());
     private Boolean sqlout;
     private Boolean prepare;
     private Boolean tranceaction;

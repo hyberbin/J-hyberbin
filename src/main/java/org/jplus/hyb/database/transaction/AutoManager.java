@@ -18,6 +18,7 @@ package org.jplus.hyb.database.transaction;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public class AutoManager extends ADbManager {
     public Connection getConnection() {
         Map<String, Connection> map = threadLocal.get();
         if (map == null) {
-            map = new HashMap<String, Connection>();
+            map = Collections.synchronizedMap(new HashMap<String, Connection>());
             threadLocal.set(map);
         }
         connection = map.get(defaultConfig);
