@@ -44,9 +44,10 @@ public class AutoManager extends ADbManager {
     /**
      * 获取数据连接. 从threadLocal中获取连接.如果连接不能用则新开启连接.
      * @return
+     * @throws java.sql.SQLException
      */
     @Override
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException {
         Map<String, Connection> map = threadLocal.get();
         if (map == null) {
             map = Collections.synchronizedMap(new HashMap<String, Connection>());

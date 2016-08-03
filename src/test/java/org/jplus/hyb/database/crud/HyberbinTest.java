@@ -53,7 +53,7 @@ public class HyberbinTest {
         SimpleConfigurator.addConfigurator(new DbConfig(DbConfig.DRIVER_SQLITE, "jdbc:sqlite:data.db", "", "", DbConfig.DEFAULT_CONFIG_NAME));
         ConfigCenter.INSTANCE.setManager(new TxManager(DbConfig.DEFAULT_CONFIG_NAME) {
             @Override
-            public Connection getConnection() {
+            public Connection getConnection() throws SQLException {
                 if (CONNECTION == null) {
                     CONNECTION = super.getConnection();
                 }

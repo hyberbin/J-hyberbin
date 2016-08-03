@@ -56,25 +56,28 @@ public abstract class ADbManager implements IDbManager {
     /**
      * 获取默认数据连接.
      * @return 
+     * @throws java.sql.SQLException 
      */
     @Override
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException{
         return getConnection(defaultConfig);
     }
     /**
      * 获取指定数据库连接.
      * @param name
      * @return 
+     * @throws java.sql.SQLException 
      */
-    protected Connection getConnection(String name) {
+    protected Connection getConnection(String name) throws SQLException{
         return getConnection(configurator.getDbConfig(name));
     }
     /**
      * 获取指定数据库配置的连接.
      * @param config
      * @return 
+     * @throws java.sql.SQLException 
      */
-    protected Connection getConnection(DbConfig config) {
+    protected Connection getConnection(DbConfig config)throws SQLException{
         return getConnection(config.getDriver(), config.getUrl(), config.getUsername(), config.getPassword());
     }
     /**
@@ -84,8 +87,9 @@ public abstract class ADbManager implements IDbManager {
      * @param username 用户名
      * @param password 密码
      * @return 
+     * @throws java.sql.SQLException 
      */
-    protected Connection getConnection(String driver, String url, String username, String password) {
+    protected Connection getConnection(String driver, String url, String username, String password) throws SQLException{
         NullUtils.validateNull(driver, "driver");
         NullUtils.validateNull(driver, "url");
         NullUtils.validateNull(driver, "username");
@@ -97,9 +101,8 @@ public abstract class ADbManager implements IDbManager {
             openTransaction();
         } catch (ClassNotFoundException ex) {
             log.error("数据库连接错误\t找不到驱动", ex);
-        } catch (SQLException ex) {
-            log.error("数据库连接错误\t", ex);
-        }
+            throw new SQLException("数据库连接错误,找不到驱动",ex);
+        } 
         return connection;
     }
     /**

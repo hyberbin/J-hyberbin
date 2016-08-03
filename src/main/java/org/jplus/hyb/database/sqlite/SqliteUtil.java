@@ -30,22 +30,26 @@ import javax.swing.*;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.jplus.hyb.database.transaction.SimpleManager;
 import org.jplus.hyb.database.transaction.SingleManager;
 
 /**
- *
+ *本类实现了一个方便,简单的K-V缓存模型.
  * @author Hyberbin
  */
 public class SqliteUtil {
 
     private static final Logger log = LoggerManager.getLogger(SqliteUtil.class);
-    private static final Map<String,String> PropertiesMap=Collections.synchronizedMap(new HashMap<String, String>());
-
+    private static final Map<String,String> PropertiesMap=new ConcurrentHashMap<String, String>();
+    /**SINGLE_MANAGER_MODE=true 只能在单线程模式下使用,可以加快数据库的访问*/
+    public static boolean SINGLE_MANAGER_MODE=false;
     static {
-        SimpleConfigurator.addConfigurator(new DbConfig("org.sqlite.JDBC", "jdbc:sqlite:data.db", "", "", "sqlite"));
+        DbConfig dbConfig = SimpleConfigurator.INSTANCE.getDbConfig("sqlite");
+        if(dbConfig==null){
+            SimpleConfigurator.addConfigurator(new DbConfig("org.sqlite.JDBC", "jdbc:sqlite:data.db", "", "", "sqlite"));
+        }
         if (!tableExist("properties")) {
             createParmeterTable();
         }
@@ -57,7 +61,7 @@ public class SqliteUtil {
      * @return 
      */
     public static IDbManager getManager(final boolean... commit) {
-        IDbManager manager = new SingleManager("sqlite"){
+        IDbManager manager = SINGLE_MANAGER_MODE?new SingleManager("sqlite"){
             @Override
             public synchronized void commit() throws SQLException {
                 if(commit.length>0&&!commit[0]){
@@ -66,7 +70,7 @@ public class SqliteUtil {
                     super.commit(); 
                 }
             }
-        };
+        }:new SimpleManager("sqlite");
         return manager;
     }
     /**

@@ -17,6 +17,7 @@
 package org.jplus.hyb.database.crud;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import org.jplus.hyb.database.adapter.IAdapter;
 import org.jplus.hyb.database.adapter.MysqlAdapter;
 import org.jplus.hyb.database.adapter.OracleAdapter;
@@ -57,8 +58,9 @@ public abstract class BaseDbTool {
     /**
      * 获取连接对象.
      * @return 连接对象.
+     * @throws java.sql.SQLException
      */
-    protected Connection getConnection() {
+    protected Connection getConnection() throws SQLException {
         return tx.getConnection();
     }
 

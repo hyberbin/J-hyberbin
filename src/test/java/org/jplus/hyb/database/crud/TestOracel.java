@@ -20,17 +20,18 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jplus.hyb.database.adapter.OracleAdapter;
 import org.jplus.hyb.database.config.DbConfig;
 import org.jplus.hyb.database.config.SimpleConfigurator;
 import org.jplus.hyb.database.transaction.IDbManager;
 import org.jplus.hyb.database.transaction.SimpleManager;
 import org.jplus.model.User;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Created by hyberbin on 15/9/14.
  */
+@Ignore
 public class TestOracel {
     static {
         SimpleConfigurator.addConfigurator(new DbConfig(DbConfig.DRIVER_ORACLE, "jdbc:oracle:thin:@192.168.1.138:1521:base", "platform", "platform", "oracle"));

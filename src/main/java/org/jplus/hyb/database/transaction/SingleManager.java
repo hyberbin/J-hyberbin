@@ -110,17 +110,17 @@ public class SingleManager extends ADbManager {
     }
 
     @Override
-    protected synchronized Connection getConnection(DbConfig config) {
+    protected synchronized Connection getConnection(DbConfig config) throws SQLException {
         return super.getConnection(config);
     }
 
     @Override
-    protected synchronized Connection getConnection(String name) {
+    protected synchronized Connection getConnection(String name) throws SQLException {
         return super.getConnection(name);
     }
 
     @Override
-    public synchronized Connection getConnection() {
+    public synchronized Connection getConnection() throws SQLException {
         return super.getConnection();
     }
 

@@ -27,7 +27,7 @@ import org.jplus.hyb.database.config.IConfigurator;
  */
 public interface IDbManager {
 
-    public Connection getConnection();
+    public Connection getConnection() throws SQLException;
 
     public void openTransaction() throws SQLException;
 
