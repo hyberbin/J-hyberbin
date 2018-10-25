@@ -410,12 +410,15 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public int insert(String primarkey) throws SQLException {
         log.trace("in insert");
-        removeField(primarkey);
-        GetSql gs = getSql();
-        String sql = gs.getInsert(tableName);//生成sql语句
-        int update = adapter.update(getConnection(), sql);
-        tx.closeConnection();
-        return update;
+        try {
+            removeField(primarkey);
+            GetSql gs = getSql();
+            String sql = gs.getInsert(tableName);//生成sql语句
+            int update = adapter.update(getConnection(), sql);
+            return update;
+        } finally {
+            tx.closeConnection();
+        }
     }
 
     /**
@@ -432,16 +435,20 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public int updateByKey(String key) throws SQLException {
         log.trace("in updateByKey");
-        removeField(key);
-        FieldColumn fieldColumn = FieldUtil.getFieldColumnByCache(FieldUtil.getField(getPo().getClass(), key));
-        GetSql gs = getSql();//自动生成sql语句
-        Object PKvalue = FieldUtil.getFieldValue(getPo(), key);
-        adapter.addParameter(PKvalue);
-        gs.add(getQuotedItem(fieldColumn.getColumn()), "?", "where");//生成sql的where部分
-        String sql = gs.getUpdate(tableName);//生成sql语句
-        int update = adapter.update(getConnection(), sql);
-        tx.closeConnection();
-        return update;
+        try {
+            removeField(key);
+            FieldColumn fieldColumn = FieldUtil
+                .getFieldColumnByCache(FieldUtil.getField(getPo().getClass(), key));
+            GetSql gs = getSql();//自动生成sql语句
+            Object PKvalue = FieldUtil.getFieldValue(getPo(), key);
+            adapter.addParameter(PKvalue);
+            gs.add(getQuotedItem(fieldColumn.getColumn()), "?", "where");//生成sql的where部分
+            String sql = gs.getUpdate(tableName);//生成sql语句
+            int update = adapter.update(getConnection(), sql);
+            return update;
+        } finally {
+            tx.closeConnection();
+        }
     }
 
     /**
@@ -454,11 +461,16 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public int autoUp(String field, String where) throws SQLException {
         log.trace("in autoUp");
-        FieldColumn fieldColumn = FieldUtil.getFieldColumnByCache(FieldUtil.getField(getPo().getClass(), field));
-        String sql = "update  " + getQuotedItem(tableName) + " set " + getQuotedItem(fieldColumn.getColumn()) + "=" + getQuotedItem(field) + "+1 " + where;
-        int update = adapter.update(getConnection(), sql);
-        tx.closeConnection();
-        return update;
+        try {
+            FieldColumn fieldColumn = FieldUtil
+                .getFieldColumnByCache(FieldUtil.getField(getPo().getClass(), field));
+            String sql = "update  " + getQuotedItem(tableName) + " set " + getQuotedItem(
+                fieldColumn.getColumn()) + "=" + getQuotedItem(field) + "+1 " + where;
+            int update = adapter.update(getConnection(), sql);
+            return update;
+        } finally {
+            tx.closeConnection();
+        }
     }
 
     /**
@@ -469,10 +481,13 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public int delete(String where) throws SQLException {
         log.trace("in delete");
-        String sql = "delete from " + getQuotedItem(tableName) + " " + where;
-        int update = adapter.update(getConnection(), sql);
-        tx.closeConnection();
-        return update;
+        try {
+            String sql = "delete from " + getQuotedItem(tableName) + " " + where;
+            int update = adapter.update(getConnection(), sql);
+            return update;
+        } finally {
+            tx.closeConnection();
+        }
     }
 
     /**
@@ -484,13 +499,19 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public int deleteByKey(String key) throws SQLException {
         log.trace("in deleteByKey");
-        FieldColumn fieldColumn = FieldUtil.getFieldColumnByCache(FieldUtil.getField(getPo().getClass(), key));
-        String sql = "delete from " + getQuotedItem(tableName) + " where " + fieldColumn.getColumn() + " =?";
-        Object PKvalue = FieldUtil.getFieldValue(getPo(), key);
-        adapter.addParameter(PKvalue);
-        int update = adapter.update(getConnection(), sql);
-        tx.closeConnection();
-        return update;
+        try {
+            FieldColumn fieldColumn = FieldUtil
+                .getFieldColumnByCache(FieldUtil.getField(getPo().getClass(), key));
+            String sql =
+                "delete from " + getQuotedItem(tableName) + " where " + fieldColumn.getColumn()
+                    + " =?";
+            Object PKvalue = FieldUtil.getFieldValue(getPo(), key);
+            adapter.addParameter(PKvalue);
+            int update = adapter.update(getConnection(), sql);
+            return update;
+        } finally {
+            tx.closeConnection();
+        }
     }
 
     /**
@@ -518,8 +539,9 @@ public class Hyberbin<T> extends BaseDbTool {
             } else {
                 throw new IllegalArgumentException("loadData error!", ex);
             }
+        }finally {
+            tx.closeConnection();
         }
-        tx.closeConnection();
         return getPo();
     }
 
@@ -571,9 +593,12 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public int getCount(String sql) throws SQLException {
         log.trace("in getCount");
-        int count = NumberUtils.parseInt(adapter.getCount(getConnection(), sql));
-        tx.closeConnection();
-        return count;
+        try {
+            int count = NumberUtils.parseInt(adapter.getCount(getConnection(), sql));
+            return count;
+        } finally {
+            tx.closeConnection();
+        }
     }
 
     /**
@@ -585,13 +610,24 @@ public class Hyberbin<T> extends BaseDbTool {
      */
     public void showByPage(String where, Pager pager) throws SQLException {
         log.trace("in showByPage");
-        String sql = "select " + getFieldList() + "  from " + getQuotedItem(tableName) + " " + where;
-        ResultSet rs = adapter.findPageList(getConnection(), sql, pager);
-        List list = loadListData(getPo(), rs);
-        tx.closeConnection();
-        pager.setItems(NumberUtils.parseInt(adapter.getCount(getConnection(), sql)));
-        pager.setData(list);
-        tx.closeConnection();
+        ResultSet rs;
+        String sql =
+            "select " + getFieldList() + "  from " + getQuotedItem(tableName) + " " + where;
+        try {
+            rs = adapter.findPageList(getConnection(), sql, pager);
+        } finally {
+            tx.closeConnection();
+        }
+        if (rs == null) {
+            return;
+        }
+        try {
+            List list = loadListData(getPo(), rs);
+            pager.setItems(NumberUtils.parseInt(adapter.getCount(getConnection(), sql)));
+            pager.setData(list);
+        } finally {
+            tx.closeConnection();
+        }
     }
 
     /**
@@ -602,13 +638,16 @@ public class Hyberbin<T> extends BaseDbTool {
      * @return 查询结果集合
      * @throws java.sql.SQLException
      */
-    public List<T> showList(String sql,Object... parmeters) throws SQLException {
+    public List<T> showList(String sql, Object... parmeters) throws SQLException {
         addParmeter(parmeters);
         log.trace("in showList");
-        ResultSet rs = adapter.findList(getConnection(), sql);//执行查询
-        List list = loadListData(getPo(), rs);
-        tx.closeConnection();
-        return list;
+        try {
+            ResultSet rs = adapter.findList(getConnection(), sql);//执行查询
+            List list = loadListData(getPo(), rs);
+            return list;
+        } finally {
+            tx.closeConnection();
+        }
     }
 
     /**
@@ -644,11 +683,14 @@ public class Hyberbin<T> extends BaseDbTool {
      * @return
      * @throws SQLException
      */
-    public List<Map> getMapList(String sql,Object... parmeters) throws SQLException {
+    public List<Map> getMapList(String sql, Object... parmeters) throws SQLException {
         addParmeter(parmeters);
-        List<Map> mapList = getMapList(adapter.findList(getConnection(), sql));
-        tx.closeConnection();
-        return mapList;
+        try {
+            List<Map> mapList = getMapList(adapter.findList(getConnection(), sql));
+            return mapList;
+        } finally {
+            tx.closeConnection();
+        }
     }
 
     /**
@@ -658,13 +700,20 @@ public class Hyberbin<T> extends BaseDbTool {
      * @param parmeters
      * @throws java.sql.SQLException
      */
-    public void getMapList(String sql, Pager pager,Object... parmeters) throws SQLException {
+    public void getMapList(String sql, Pager pager, Object... parmeters) throws SQLException {
         addParmeter(parmeters);
-        ResultSet findPageList = adapter.findPageList(getConnection(), sql, pager);
-        pager.setData(getMapList(findPageList));
-        tx.closeConnection();
-        pager.setItems(adapter.getCount(getConnection(), sql));
-        tx.closeConnection();
+        try {
+            ResultSet findPageList = adapter.findPageList(getConnection(), sql, pager);
+            pager.setData(getMapList(findPageList));
+        } finally {
+            tx.closeConnection();
+        }
+        try {
+            pager.setItems(adapter.getCount(getConnection(), sql));
+        } finally {
+            tx.closeConnection();
+
+        }
     }
 
     /**
